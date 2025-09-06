@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    /* Body & background */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #e2eafc);
+      min-height: 100vh;
+      padding-top: 70px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #0d6efd, #5a8dee);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.6rem;
+      color: #fff !important;
+      transition: color 0.3s ease;
+    }
+    .navbar-nav .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin-left: 15px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .navbar-nav .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background: #ffd700;
+      transition: width 0.3s ease;
+    }
+    .navbar-nav .nav-link:hover::after {
+      width: 100%;
+    }
+    .navbar-nav .nav-link:hover {
+      color: #ffd700 !important;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+    .btn-warning {
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 8px 20px;
+      transition: all 0.3s ease;
+      background: linear-gradient(45deg, #ffd700, #ffb347);
+    }
+    .btn-warning:hover {
+      background: linear-gradient(45deg, #ffb347, #ffd700);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Dashboard Content / Cards */
+    .dashboard-content {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+      max-width: 700px;
+      text-align: center;
+      transition: all 0.4s ease;
+    }
+    .dashboard-content:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(255, 215, 0, 0.25);
+    }
+    .dashboard-content h1 {
+      font-weight: 800;
+      color: #0d6efd;
+      margin-bottom: 25px;
+      letter-spacing: 1.2px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+    .username {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    p {
+      color: #555;
+      font-size: 1.1rem;
+    }
+
+    /* Table Styling */
+    .table thead {
+      background: linear-gradient(90deg, #0d6efd, #5a8dee);
+      color: #fff;
+    }
+    .table-hover tbody tr:hover {
+      background: rgba(255, 215, 0, 0.15);
+      transform: scale(1.01);
+      transition: all 0.2s ease;
+    }
+    .badge.bg-success { background-color: #28a745 !important; }
+    .badge.bg-warning { background-color: #ffc107 !important; }
+    .badge.bg-danger { background-color: #dc3545 !important; }
+
+    /* List / Notifications */
+    .list-group-item {
+      background: transparent;
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* Animated background blobs */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      filter: blur(100px);
+      opacity: 0.5;
+      animation: float 10s infinite alternate;
+      z-index: -1;
+    }
+    body::after {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(135deg, #0d6efd, #5a8dee);
+      bottom: -50px;
+      right: -50px;
+      animation-duration: 12s;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px) translateX(0px); }
+      100% { transform: translateY(-30px) translateX(30px); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">My Profile System</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">My Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'myattendance' %}">My Attendance</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'attendance_summary' %}">Attendance Summary</a></li>
+          <li class="nav-item">
+            <a href="{% url 'download_attendance_pdf' %}" class="btn btn-warning text-dark ms-2">Download Report</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Content -->
+  <div class="container my-5">
+    <!-- Profile Card -->
+    <div class="dashboard-content mb-4">
+      <h1>Profile Info</h1>
+      <p><strong>Name:</strong> {{ profile.student_name|default:user.get_full_name|default:user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Roll Number:</strong> {{ profile.roll_no|default:'N/A' }}</p>
+      <p><strong>Branch:</strong> {{ profile.branch|default:'N/A' }}</p>
+      <a href="{% url 'profile' %}" class="btn btn-warning mt-3">Edit Profile</a>
+    </div>
+
+    <!-- Attendance Summary Card -->
+    <div class="dashboard-content mb-4">
+      <h1>Attendance Summary</h1>
+      <div class="table-responsive">
+        <table class="table table-hover text-center align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Subject</th>
+              <th>Attended</th>
+              <th>Total</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in attendance_summary %}
+            <tr>
+              <td>{{ record.subject_name }}</td>
+              <td>{{ record.attended }}</td>
+              <td>{{ record.total }}</td>
+              <td>
+                <span class="badge {{ record.percentage|floatformat:0|yesno:'bg-success,bg-warning,bg-danger' }}">
+                  {{ record.percentage }}%
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <a href="{% url 'download_attendance_pdf' %}" class="btn btn-warning mt-3">Download Report</a>
+    </div>
+
+    <!-- Recent Activity / Notifications -->
+    <div class="dashboard-content mb-4">
+      <h1>Recent Activity</h1>
+      <ul class="list-group list-group-flush">
+        {% for notification in notifications %}
+        <li class="list-group-item bg-transparent border-0">
+          <span class="fw-semibold text-dark">{{ notification.date }}</span> – {{ notification.message }}
+        </li>
+        {% empty %}
+        <li class="list-group-item bg-transparent border-0 text-muted">No recent activity.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
