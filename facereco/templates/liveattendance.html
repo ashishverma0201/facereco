@@ -1,231 +1,2044 @@
+{% load static %}
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Live Attendance</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-<style>
-/* Body and Background */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 15px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* Card Styling */
-.card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    width: 100%;
-    max-width: 600px;
-    animation: fadeInUp 1s ease;
-    color: #fff;
-}
+    <title>Live Attendance</title>
 
-/* Headings */
-h2 {
-    font-weight: 700;
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 30px;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
-}
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Alerts */
-.alert {
-    border-radius: 15px;
-    font-weight: 500;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #1c0f2e, #140a22, #0b0614);
+            color: white;
+            min-height: 100vh;
+            padding: 30px;
+        }
 
-/* Form Labels */
-label {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
 
-/* Select and Input Styling */
-.form-select, .btn {
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-.form-select:focus, .btn:focus {
-    box-shadow: 0 0 10px rgba(255,255,255,0.7);
-    outline: none;
-}
+        .header h1 {
+            font-size: 28px;
+        }
 
-/* Buttons */
-.btn-success {
-    background: linear-gradient(135deg, #43e97b, #38f9d7);
-    border: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 10px 0;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
+        .header p {
+            color: #999;
+            margin-top: 6px;
+        }
 
-.btn-success:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-}
+        .back-btn {
+            text-decoration: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
 
-/* Webcam & Canvas */
-video, canvas {
-    width: 100%;
-    border-radius: 15px;
-    margin-top: 10px;
-    border: 2px solid rgba(255,255,255,0.5);
-}
+        .back-btn:hover {
+            background: rgba(255,255,255,0.14);
+        }
 
-/* Capture Button */
-.btn-secondary {
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
-    border: none;
-    color: #fff;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
+        .card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(15px);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 30px rgba(255,0,200,0.08);
+        }
 
-.btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
+        .card h2 {
+            margin-bottom: 20px;
+        }
 
-/* Animations */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(40px);}
-    to { opacity: 1; transform: translateY(0);}
-}
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
 
-/* Responsive */
-@media(max-width: 576px){
-    .card { padding: 20px; }
-    h2 { font-size: 1.7rem; }
-}
-</style>
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d8d0e5;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: #1b102b;
+            color: white;
+            outline: none;
+        }
+
+        select:disabled {
+            opacity: 0.75;
+            cursor: not-allowed;
+        }
+
+        .info {
+            margin-top: 18px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: rgba(0, 200, 255, 0.08);
+            border: 1px solid rgba(0, 200, 255, 0.15);
+            color: #cfefff;
+            font-size: 14px;
+        }
+
+        .camera-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .camera-box {
+            width: 100%;
+            min-height: 420px;
+            background: #05030a;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+            object-fit: cover;
+            display: none;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .camera-placeholder {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+        }
+
+        .camera-placeholder .icon {
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            padding: 13px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            color: white;
+            transition: 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #d600a9, #8e2de2);
+        }
+
+        .stop-btn {
+            background: #b42335;
+        }
+
+        .status {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            min-height: 55px;
+            line-height: 1.5;
+        }
+
+        .status.success {
+            color: #5cff9d;
+        }
+
+        .status.error {
+            color: #ff6b81;
+        }
+
+        .status.warning {
+            color: #ffd166;
+        }
+
+        .details {
+            margin-top: 20px;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .details-row:last-child {
+            border-bottom: none;
+        }
+
+        .details-label {
+            color: #999;
+        }
+
+        .details-value {
+            color: white;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .result-box {
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+        }
+
+        .result-success {
+            color: #5cff9d;
+        }
+
+        .result-error {
+            color: #ff6b81;
+        }
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .camera-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+
 </head>
+
 <body>
 
-<div class="card shadow">
+<div class="container">
 
-<h2>Live Attendance</h2>
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
 
-{% if error %}
-<div class="alert alert-danger">{{ error }}</div>
-{% endif %}
-{% if success %}
-<div class="alert alert-success">
-    {{ success }}<br>
-    <b>Student Name:</b> {{ student.student_name }} <br>
-    <b>Roll No:</b> {{ student.roll_no }} <br>
-    <b>Branch:</b> {{ student.branch }} <br>
-    <b>Semester:</b> {{ student.semester }} <br>
-    <b>Subject:</b> {{ subject.name }}
+    <div class="header">
+
+        <div>
+            <h1>📷 Live Attendance</h1>
+
+            <p>
+                Face Recognition Attendance System
+            </p>
+        </div>
+
+        {% if teacher_mode %}
+
+            <a href="{% url 'teacherpanel' %}"
+               class="back-btn">
+
+                ← Teacher Panel
+
+            </a>
+
+        {% else %}
+
+            <a href="{% url 'adminpanel' %}"
+               class="back-btn">
+
+                ← Admin Panel
+
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ATTENDANCE DETAILS -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>Attendance Details</h2>
+
+        <div class="form-grid">
+
+            <!-- ================= BRANCH ================= -->
+
+            <div class="field">
+
+                <label>
+                    Branch
+                </label>
+
+                {% if teacher_mode %}
+
+                    <select id="branch" disabled>
+
+                        <option
+                            value="{{ teacher_branch }}"
+                            selected>
+
+                            {{ teacher_branch }}
+
+                        </option>
+
+                    </select>
+
+                    <input
+                        type="hidden"
+                        id="branchHidden"
+                        value="{{ teacher_branch }}"
+                    >
+
+                {% else %}
+
+                    <select id="branch">
+
+                        <option value="">
+                            Select Branch
+                        </option>
+
+                        {% for branch in branches %}
+
+                            <option value="{{ branch }}">
+                                {{ branch }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================= SEMESTER ================= -->
+
+            <div class="field">
+
+                <label>
+                    Semester
+                </label>
+
+                <select id="semester">
+
+                    <option value="">
+                        Select Semester
+                    </option>
+
+                    {% if teacher_mode %}
+
+                        {% for semester in assigned_semesters %}
+
+                            <option
+                                value="{{ semester }}">
+
+                                {% if semester == "1" %}
+                                    1st Semester
+                                {% elif semester == "2" %}
+                                    2nd Semester
+                                {% elif semester == "3" %}
+                                    3rd Semester
+                                {% elif semester == "4" %}
+                                    4th Semester
+                                {% elif semester == "5" %}
+                                    5th Semester
+                                {% elif semester == "6" %}
+                                    6th Semester
+                                {% elif semester == "7" %}
+                                    7th Semester
+                                {% elif semester == "8" %}
+                                    8th Semester
+                                {% else %}
+                                    {{ semester }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <option value="First">
+                            1st Semester
+                        </option>
+
+                        <option value="Second">
+                            2nd Semester
+                        </option>
+
+                        <option value="Third">
+                            3rd Semester
+                        </option>
+
+                        <option value="Fourth">
+                            4th Semester
+                        </option>
+
+                        <option value="Fifth">
+                            5th Semester
+                        </option>
+
+                        <option value="Sixth">
+                            6th Semester
+                        </option>
+
+                    {% endif %}
+
+                </select>
+
+            </div>
+
+
+            <!-- ================= SUBJECT ================= -->
+
+            <div class="field">
+
+                <label>
+                    Subject
+                </label>
+
+                {% if teacher_mode %}
+
+                    <select id="subject">
+
+                        <option value="">
+                            Select Subject
+                        </option>
+
+                        {% for subject in assigned_subjects %}
+
+                            <option
+                                value="{{ subject.name }}"
+                                data-subject-id="{{ subject.id }}"
+                                data-semester="{{ subject.semester }}">
+
+                                {{ subject.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                {% else %}
+
+                    <select id="subject">
+
+                        <option value="">
+                            Select Subject
+                        </option>
+
+                    </select>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% if teacher_mode %}
+
+            <div class="info">
+
+                🔒 Branch, semester and subjects are based
+                on the subjects assigned to this teacher.
+
+            </div>
+
+        {% else %}
+
+            <div class="info">
+
+                Select branch, semester and subject
+                before starting attendance.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CAMERA -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Face Recognition
+        </h2>
+
+        <div class="camera-layout">
+
+            <!-- ================= CAMERA ================= -->
+
+            <div>
+
+                <div class="camera-box">
+
+                    <video
+                        id="video"
+                        autoplay
+                        playsinline>
+                    </video>
+
+                    <div
+                        id="cameraPlaceholder"
+                        class="camera-placeholder">
+
+                        <div class="icon">
+                            📷
+                        </div>
+
+                        <div>
+                            Camera is not started
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <canvas id="canvas"></canvas>
+
+            </div>
+
+
+            <!-- ================= CONTROLS ================= -->
+
+            <div>
+
+                <div class="controls">
+
+                    <button
+                        type="button"
+                        id="startCameraBtn"
+                        class="start-btn">
+
+                        📷 Start Attendance
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="stopCameraBtn"
+                        class="stop-btn"
+                        disabled>
+
+                        ⛔ Stop Attendance
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="status"
+                    class="status">
+
+                    Select attendance details
+                    and start attendance.
+
+                </div>
+
+
+                <!-- SELECTED DETAILS -->
+
+                <div class="details">
+
+                    <div class="details-row">
+
+                        <span class="details-label">
+                            Branch
+                        </span>
+
+                        <span
+                            id="selectedBranch"
+                            class="details-value">
+
+                            -
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="details-row">
+
+                        <span class="details-label">
+                            Semester
+                        </span>
+
+                        <span
+                            id="selectedSemester"
+                            class="details-value">
+
+                            -
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="details-row">
+
+                        <span class="details-label">
+                            Subject
+                        </span>
+
+                        <span
+                            id="selectedSubject"
+                            class="details-value">
+
+                            -
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- RESULT -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Attendance Result
+        </h2>
+
+        <div
+            id="result"
+            class="result-box">
+
+            <span style="color:#888;">
+                No attendance recorded yet.
+            </span>
+
+        </div>
+
+    </div>
+
 </div>
-{% endif %}
 
-<form method="post" onsubmit="return validateForm();">
-{% csrf_token %}
-
-<div class="mb-3">
-<label>Branch</label>
-<select class="form-select" id="branch" name="branch" onchange="updateSemester();" required>
-    <option value="">Select Branch</option>
-    {% for b in branches %}
-    <option value="{{ b }}">{{ b }}</option>
-    {% endfor %}
-</select>
-</div>
-
-<div class="mb-3">
-<label>Semester</label>
-<select class="form-select" id="semester" name="semester" onchange="updateSubject();" required>
-    <option value="">Select Semester</option>
-</select>
-</div>
-
-<div class="mb-3">
-<label>Subject</label>
-<select class="form-select" id="subject" name="subject" required>
-    <option value="">Select Subject</option>
-</select>
-</div>
-
-<div class="mb-3">
-<label>Capture Your Face</label>
-<video id="webcam" autoplay></video>
-<canvas id="canvas" style="display:none;"></canvas>
-<input type="hidden" name="face_image_data" id="faceImageData">
-<button type="button" class="btn btn-secondary mt-2 w-100" onclick="captureImage()">📸 Capture Face</button>
-</div>
-
-<button type="submit" class="btn btn-success mt-3 w-100">✅ Mark Attendance</button>
-</form>
-</div>
 
 <script>
-// Branch → Semester → Subject mapping
-const branchSemSubjects = {{ semester_subjects|safe }};
 
-// Populate semester dropdown
-function updateSemester() {
-    const branch = document.getElementById('branch').value;
-    const semesterSelect = document.getElementById('semester');
-    semesterSelect.innerHTML = '<option value="">Select Semester</option>';
-    if(branch in branchSemSubjects){
-        for(let sem in branchSemSubjects[branch]){
-            semesterSelect.innerHTML += `<option value="${sem}">${sem}</option>`;
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+
+let stream = null;
+let attendanceInterval = null;
+let recognitionRunning = false;
+
+
+/* =====================================================
+   GET ELEMENTS
+===================================================== */
+
+const video =
+    document.getElementById("video");
+
+const canvas =
+    document.getElementById("canvas");
+
+const branchSelect =
+    document.getElementById("branch");
+
+const semesterSelect =
+    document.getElementById("semester");
+
+const subjectSelect =
+    document.getElementById("subject");
+
+const startCameraBtn =
+    document.getElementById("startCameraBtn");
+
+const stopCameraBtn =
+    document.getElementById("stopCameraBtn");
+
+const statusBox =
+    document.getElementById("status");
+
+const resultBox =
+    document.getElementById("result");
+
+
+/* =====================================================
+   GET BRANCH
+===================================================== */
+
+function getBranch() {
+
+    {% if teacher_mode %}
+
+        return document.getElementById(
+            "branchHidden"
+        ).value;
+
+    {% else %}
+
+        return branchSelect.value;
+
+    {% endif %}
+
+}
+
+
+/* =====================================================
+   SEMESTER TEXT
+===================================================== */
+
+function getSemesterText() {
+
+    const option =
+        semesterSelect.options[
+            semesterSelect.selectedIndex
+        ];
+
+    if (!option || !option.value) {
+        return "-";
+    }
+
+    return option.textContent.trim();
+
+}
+
+
+/* =====================================================
+   UPDATE DETAILS
+===================================================== */
+
+function updateDetails() {
+
+    const branch =
+        getBranch();
+
+    const subjectOption =
+        subjectSelect.options[
+            subjectSelect.selectedIndex
+        ];
+
+
+    document.getElementById(
+        "selectedBranch"
+    ).textContent =
+        branch || "-";
+
+
+    document.getElementById(
+        "selectedSemester"
+    ).textContent =
+        getSemesterText();
+
+
+    document.getElementById(
+        "selectedSubject"
+    ).textContent =
+        subjectOption &&
+        subjectOption.value
+            ? subjectOption.textContent.trim()
+            : "-";
+
+}
+
+
+/* =====================================================
+   TEACHER SUBJECT FILTER
+===================================================== */
+
+{% if teacher_mode %}
+
+function filterTeacherSubjects() {
+
+    const semester =
+        semesterSelect.value;
+
+    const options =
+        subjectSelect.querySelectorAll(
+            "option[data-semester]"
+        );
+
+
+    options.forEach(function(option) {
+
+        const subjectSemester =
+            option.getAttribute(
+                "data-semester"
+            );
+
+
+        if (
+            !semester ||
+            subjectSemester === semester
+        ) {
+
+            option.hidden = false;
+
+        } else {
+
+            option.hidden = true;
+
         }
+
+    });
+
+
+    const selected =
+        subjectSelect.options[
+            subjectSelect.selectedIndex
+        ];
+
+
+    if (
+        selected &&
+        selected.value &&
+        selected.hidden
+    ) {
+
+        subjectSelect.value = "";
+
     }
-    updateSubject();
+
+
+    updateDetails();
+
 }
 
-// Populate subject dropdown
-function updateSubject() {
-    const branch = document.getElementById('branch').value;
-    const semester = document.getElementById('semester').value;
-    const subjectSelect = document.getElementById('subject');
-    subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-    if(branch && semester && branch in branchSemSubjects && semester in branchSemSubjects[branch]){
-        branchSemSubjects[branch][semester].forEach(sub=>{
-            subjectSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+
+function initializeTeacherDetails() {
+
+    const semesterCount =
+        {{ assigned_semesters|length }};
+
+    const subjectCount =
+        {{ assigned_subjects|length }};
+
+
+    if (semesterCount === 1) {
+
+        semesterSelect.value =
+            "{{ assigned_semesters.0 }}";
+
+    }
+
+
+    filterTeacherSubjects();
+
+
+    if (subjectCount === 1) {
+
+        subjectSelect.value =
+            "{{ assigned_subjects.0.id }}";
+
+    }
+
+
+    if (subjectSelect.value) {
+
+        const selected =
+            subjectSelect.options[
+                subjectSelect.selectedIndex
+            ];
+
+        if (selected) {
+
+            const subjectSemester =
+                selected.getAttribute(
+                    "data-semester"
+                );
+
+            if (subjectSemester) {
+
+                semesterSelect.value =
+                    subjectSemester;
+
+            }
+
+        }
+
+    }
+
+
+    filterTeacherSubjects();
+
+    updateDetails();
+
+}
+
+{% endif %}
+
+
+/* =====================================================
+   ADMIN SUBJECT DATA
+===================================================== */
+
+{% if not teacher_mode %}
+
+const semesterSubjects =
+    {{ semester_subjects|safe }};
+
+
+function updateAdminSubjects() {
+
+    const branch =
+        branchSelect.value;
+
+    const semester =
+        semesterSelect.value;
+
+
+    subjectSelect.innerHTML =
+        '<option value="">Select Subject</option>';
+
+
+    if (
+        branch &&
+        semester &&
+        semesterSubjects[branch] &&
+        semesterSubjects[branch][semester]
+    ) {
+
+        semesterSubjects[branch][semester]
+            .forEach(function(subjectName) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    subjectName;
+
+                option.textContent =
+                    subjectName;
+
+                subjectSelect.appendChild(
+                    option
+                );
+
+            });
+
+    }
+
+
+    updateDetails();
+
+}
+
+
+branchSelect.addEventListener(
+    "change",
+    function() {
+
+        updateAdminSubjects();
+
+    }
+);
+
+
+semesterSelect.addEventListener(
+    "change",
+    function() {
+
+        updateAdminSubjects();
+
+    }
+);
+
+{% else %}
+
+
+/* =====================================================
+   TEACHER EVENTS
+===================================================== */
+
+semesterSelect.addEventListener(
+    "change",
+    function() {
+
+        filterTeacherSubjects();
+
+    }
+);
+
+
+subjectSelect.addEventListener(
+    "change",
+    function() {
+
+        const selected =
+            subjectSelect.options[
+                subjectSelect.selectedIndex
+            ];
+
+
+        if (selected) {
+
+            const subjectSemester =
+                selected.getAttribute(
+                    "data-semester"
+                );
+
+
+            if (subjectSemester) {
+
+                semesterSelect.value =
+                    subjectSemester;
+
+            }
+
+        }
+
+
+        filterTeacherSubjects();
+
+    }
+);
+
+{% endif %}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(
+    message,
+    type = ""
+) {
+
+    statusBox.textContent =
+        message;
+
+    statusBox.className =
+        "status " + type;
+
+}
+
+
+/* =====================================================
+   START ATTENDANCE
+===================================================== */
+
+async function startCamera() {
+
+    const branch =
+        getBranch();
+
+    const semester =
+        semesterSelect.value;
+
+    const subject =
+        subjectSelect.value;
+
+
+    if (!branch) {
+
+        setStatus(
+            "⚠️ Branch is required.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!semester) {
+
+        setStatus(
+            "⚠️ Please select semester.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!subject) {
+
+        setStatus(
+            "⚠️ Please select subject.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        setStatus(
+            "❌ Camera API is not available. Open the Django site using localhost or HTTPS.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        setStatus(
+            "📷 Requesting camera permission...",
+            "warning"
+        );
+
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+                    width: {
+                        ideal: 1280
+                    },
+
+                    height: {
+                        ideal: 720
+                    },
+
+                    facingMode: "user"
+                },
+
+                audio: false
+
+            });
+
+
+        video.srcObject =
+            stream;
+
+
+        await new Promise(function(resolve) {
+
+            if (
+                video.readyState >= 2
+            ) {
+
+                resolve();
+
+            } else {
+
+                video.onloadedmetadata =
+                    function() {
+
+                        resolve();
+
+                    };
+
+            }
+
         });
+
+
+        await video.play();
+
+
+        video.style.display =
+            "block";
+
+
+        document.getElementById(
+            "cameraPlaceholder"
+        ).style.display =
+            "none";
+
+
+        startCameraBtn.disabled =
+            true;
+
+        stopCameraBtn.disabled =
+            false;
+
+
+        recognitionRunning =
+            true;
+
+
+        setStatus(
+            "✅ Attendance started. Camera is continuously scanning...",
+            "success"
+        );
+
+
+        attendanceInterval =
+            setInterval(
+                captureAndRecognize,
+                1500
+            );
+
     }
-}
 
-// Webcam
-const webcam = document.getElementById('webcam');
-const canvas = document.getElementById('canvas');
-const faceImageData = document.getElementById('faceImageData');
+    catch (error) {
 
-navigator.mediaDevices.getUserMedia({video:true})
-.then(stream => webcam.srcObject = stream)
-.catch(err => alert('Cannot access webcam. Please allow permission.') );
+        console.error(
+            "Camera error:",
+            error
+        );
 
-function captureImage(){
-    canvas.width = webcam.videoWidth;
-    canvas.height = webcam.videoHeight;
-    canvas.getContext('2d').drawImage(webcam,0,0,canvas.width,canvas.height);
-    faceImageData.value = canvas.toDataURL('image/png');
-    alert('✅ Face captured!');
-}
 
-// Validate form
-function validateForm(){
-    if(!faceImageData.value){
-        alert('⚠️ Please capture your face before submitting.');
-        return false;
+        setStatus(
+            "❌ Camera start nahi hua: " +
+            error.message,
+            "error"
+        );
+
     }
-    return true;
+
 }
+
+
+/* =====================================================
+   STOP ATTENDANCE
+===================================================== */
+
+function stopCamera() {
+
+    recognitionRunning =
+        false;
+
+
+    if (attendanceInterval) {
+
+        clearInterval(
+            attendanceInterval
+        );
+
+        attendanceInterval =
+            null;
+
+    }
+
+
+    if (stream) {
+
+        stream.getTracks().forEach(
+            function(track) {
+
+                track.stop();
+
+            }
+        );
+
+        stream =
+            null;
+
+    }
+
+
+    video.srcObject =
+        null;
+
+
+    video.style.display =
+        "none";
+
+
+    document.getElementById(
+        "cameraPlaceholder"
+    ).style.display =
+        "block";
+
+
+    startCameraBtn.disabled =
+        false;
+
+    stopCameraBtn.disabled =
+        true;
+
+
+    setStatus(
+        "Camera stopped.",
+        "warning"
+    );
+
+}
+
+
+/* =====================================================
+   CAPTURE FRAME AUTOMATICALLY
+===================================================== */
+
+async function captureAndRecognize() {
+
+    if (
+        !recognitionRunning ||
+        !stream ||
+        !video.videoWidth ||
+        !video.videoHeight
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        captureAndRecognize.processing
+    ) {
+
+        return;
+
+    }
+
+
+    captureAndRecognize.processing =
+        true;
+
+
+    try {
+
+        const branch =
+            getBranch();
+
+        const semester =
+            semesterSelect.value;
+
+        const subject =
+            subjectSelect.value;
+
+
+        if (
+            !branch ||
+            !semester ||
+            !subject
+        ) {
+
+            return;
+
+        }
+
+
+        canvas.width =
+            video.videoWidth;
+
+        canvas.height =
+            video.videoHeight;
+
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        const imageData =
+            canvas.toDataURL(
+                "image/jpeg",
+                0.85
+            );
+
+
+        await sendAttendance(
+            imageData,
+            branch,
+            semester,
+            subject
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Recognition error:",
+            error
+        );
+
+    }
+
+    finally {
+
+        captureAndRecognize.processing =
+            false;
+
+    }
+
+}
+
+
+/* =====================================================
+   SEND ATTENDANCE
+===================================================== */
+
+async function sendAttendance(
+    imageData,
+    branch,
+    semester,
+    subject
+) {
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "face_image_data",
+        imageData
+    );
+
+
+    formData.append(
+        "branch",
+        branch
+    );
+
+
+    formData.append(
+        "semester",
+        semester
+    );
+
+
+    {% if teacher_mode %}
+
+        const selectedSubject =
+            subjectSelect.options[
+                subjectSelect.selectedIndex
+            ];
+
+
+        const subjectName =
+            selectedSubject
+                ? selectedSubject.textContent.trim()
+                : "";
+
+
+        formData.append(
+            "subject",
+            subjectName
+        );
+
+    {% else %}
+
+        formData.append(
+            "subject",
+            subject
+        );
+
+    {% endif %}
+
+
+    formData.append(
+        "csrfmiddlewaretoken",
+        getCSRFToken()
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "{% url 'recognize_attendance' %}",
+                {
+                    method: "POST",
+
+                    body: formData,
+
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* =============================================
+           SUCCESS
+        ============================================= */
+
+        if (data.success) {
+
+            setStatus(
+                "✅ " +
+                (
+                    data.message ||
+                    "Attendance marked successfully!"
+                ),
+                "success"
+            );
+
+
+            /*
+             * MULTIPLE STUDENTS
+             *
+             * Backend now returns:
+             *
+             * data.marked_students
+             *
+             * instead of:
+             *
+             * data.student_name
+             * data.roll_no
+             */
+
+            let markedStudentsHTML = "";
+
+
+            if (
+                data.marked_students &&
+                data.marked_students.length > 0
+            ) {
+
+                markedStudentsHTML =
+                    data.marked_students.map(
+                        function(student, index) {
+
+                            return `
+
+                                <div style="
+                                    padding: 14px 0;
+                                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                                ">
+
+                                    <strong>
+                                        ${escapeHTML(
+                                            student.student_name || "-"
+                                        )}
+                                    </strong>
+
+                                    <br>
+
+                                    Roll No:
+                                    ${escapeHTML(
+                                        student.roll_no || "-"
+                                    )}
+
+                                    <br>
+
+                                    Branch:
+                                    ${escapeHTML(
+                                        student.branch || branch
+                                    )}
+
+                                    <br>
+
+                                    Semester:
+                                    ${escapeHTML(
+                                        student.semester || semester
+                                    )}
+
+                                    <br>
+
+                                    Subject:
+                                    ${escapeHTML(
+                                        student.subject ||
+                                        getSelectedSubjectName()
+                                    )}
+
+                                    <br>
+
+                                    Face Distance:
+                                    ${escapeHTML(
+                                        student.face_distance ?? "-"
+                                    )}
+
+                                </div>
+
+                            `;
+
+                        }
+                    ).join("");
+
+            }
+
+
+            /*
+             * ALREADY MARKED STUDENTS
+             */
+
+            let alreadyMarkedHTML = "";
+
+
+            if (
+                data.already_marked_students &&
+                data.already_marked_students.length > 0
+            ) {
+
+                alreadyMarkedHTML = `
+
+                    <div style="
+                        margin-top: 15px;
+                        color: #ffd166;
+                    ">
+
+                        <strong>
+                            ⚠️ Already Marked
+                        </strong>
+
+                        <br><br>
+
+                        ${
+                            data.already_marked_students.map(
+                                function(student) {
+
+                                    return `
+
+                                        <div style="
+                                            padding: 8px 0;
+                                        ">
+
+                                            ${escapeHTML(
+                                                student.student_name || "-"
+                                            )}
+
+                                            <br>
+
+                                            Roll No:
+                                            ${escapeHTML(
+                                                student.roll_no || "-"
+                                            )}
+
+                                        </div>
+
+                                    `;
+
+                                }
+                            ).join("")
+                        }
+
+                    </div>
+
+                `;
+
+            }
+
+
+            resultBox.innerHTML = `
+
+                <div class="result-success">
+
+                    <strong>
+                        ✅ Attendance Marked
+                    </strong>
+
+                    <br><br>
+
+                    ${markedStudentsHTML}
+
+                    ${alreadyMarkedHTML}
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        /* =============================================
+           ALREADY MARKED
+        ============================================= */
+
+        if (data.already_marked) {
+
+            setStatus(
+                "⚠️ " +
+                (
+                    data.message ||
+                    "Attendance already marked."
+                ),
+                "warning"
+            );
+
+
+            resultBox.innerHTML = `
+
+                <div class="result-error">
+
+                    <strong>
+                        ⚠️ Already Marked
+                    </strong>
+
+                    <br><br>
+
+                    ${
+                        escapeHTML(
+                            data.message ||
+                            "Attendance already marked."
+                        )
+                    }
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        /*
+         * Face not recognized ya no face
+         * hone par camera band nahi hoga.
+         */
+
+        if (
+            data.error ===
+            "Face not recognized."
+        ) {
+
+            setStatus(
+                "🔍 Face not recognized. Camera scanning continues...",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            data.error &&
+            data.error.includes(
+                "No face detected"
+            )
+        ) {
+
+            setStatus(
+                "👤 No face detected. Camera scanning continues...",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        setStatus(
+            "❌ " +
+            (
+                data.error ||
+                "Face recognition failed."
+            ),
+            "error"
+        );
+
+
+        resultBox.innerHTML = `
+
+            <div class="result-error">
+
+                ❌ ${
+                    escapeHTML(
+                        data.error ||
+                        "Face recognition failed."
+                    )
+                }
+
+            </div>
+
+        `;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Attendance request error:",
+            error
+        );
+
+
+        setStatus(
+            "❌ Could not connect to server.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SELECTED SUBJECT NAME
+===================================================== */
+
+function getSelectedSubjectName() {
+
+    const option =
+        subjectSelect.options[
+            subjectSelect.selectedIndex
+        ];
+
+
+    if (!option) {
+
+        return "-";
+
+    }
+
+
+    return option.textContent.trim();
+
+}
+
+
+/* =====================================================
+   CSRF TOKEN
+===================================================== */
+
+function getCSRFToken() {
+
+    const name =
+        "csrftoken";
+
+
+    let cookieValue =
+        null;
+
+
+    if (document.cookie) {
+
+        const cookies =
+            document.cookie.split(";");
+
+
+        for (
+            let i = 0;
+            i < cookies.length;
+            i++
+        ) {
+
+            const cookie =
+                cookies[i].trim();
+
+
+            if (
+                cookie.substring(
+                    0,
+                    name.length + 1
+                ) ===
+                name + "="
+            ) {
+
+                cookieValue =
+                    decodeURIComponent(
+                        cookie.substring(
+                            name.length + 1
+                        )
+                    );
+
+                break;
+
+            }
+
+        }
+
+    }
+
+
+    return cookieValue;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   BUTTON EVENTS
+===================================================== */
+
+startCameraBtn.addEventListener(
+    "click",
+    startCamera
+);
+
+
+stopCameraBtn.addEventListener(
+    "click",
+    stopCamera
+);
+
+
+/* =====================================================
+   PAGE LOAD
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        {% if teacher_mode %}
+
+            initializeTeacherDetails();
+
+        {% endif %}
+
+        updateDetails();
+
+    }
+);
+
+
+/* =====================================================
+   PAGE CLOSE
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        if (attendanceInterval) {
+
+            clearInterval(
+                attendanceInterval
+            );
+
+        }
+
+
+        if (stream) {
+
+            stream.getTracks().forEach(
+                function(track) {
+
+                    track.stop();
+
+                }
+            );
+
+        }
+
+    }
+);
+
 </script>
+
 </body>
 </html>

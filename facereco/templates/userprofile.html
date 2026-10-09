@@ -1,69 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>User Panel</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>User Profile</title>
+
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
     <style>
+
         body {
             background-color: #f8f9fa;
             padding: 40px;
             font-family: 'Segoe UI', sans-serif;
         }
+
         .profile-container {
-            max-width: 600px;
+            max-width: 650px;
             margin: auto;
             background: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
+
         .profile-image {
-            max-width: 150px;
-            max-height: 150px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 20px;
+            border: 4px solid #f1f1f1;
         }
+
+        .profile-title {
+            font-weight: 600;
+        }
+
     </style>
+
 </head>
+
+
 <body>
-  <div class="profile-container text-center">
-    <h2 class="mb-4">User Profile</h2>
-    
-    {% if profile and profile.face_image %}
-      <img src="{{ profile.face_image.url }}" alt="Face Image" class="profile-image" />
+
+<div class="profile-container text-center">
+
+    <h2 class="profile-title mb-4">
+        User Profile
+    </h2>
+
+
+    <!-- ============================= -->
+    <!-- CHECK STUDENT PROFILE -->
+    <!-- ============================= -->
+
+    {% if profile %}
+
+
+        <!-- ============================= -->
+        <!-- FACE IMAGE -->
+        <!-- ============================= -->
+
+        {% if profile.face_image %}
+
+            <img
+                src="{{ profile.face_image.url }}"
+                alt="Face Image"
+                class="profile-image"
+            >
+
+        {% else %}
+
+            <div
+                class="profile-image d-flex align-items-center justify-content-center mx-auto bg-light"
+            >
+                No Image
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- ============================= -->
+        <!-- STUDENT DETAILS -->
+        <!-- ============================= -->
+
+        <table class="table table-striped mt-3">
+
+            <tbody>
+
+
+                <tr>
+
+                    <th scope="row">
+                        Roll Number
+                    </th>
+
+                    <td>
+                        {{ profile.roll_no }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th scope="row">
+                        Student Name
+                    </th>
+
+                    <td>
+                        {{ profile.student_name }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th scope="row">
+                        Branch
+                    </th>
+
+                    <td>
+                        {{ profile.branch }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th scope="row">
+                        Semester
+                    </th>
+
+                    <td>
+                        {{ profile.semester }}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <th scope="row">
+                        Email
+                    </th>
+
+                    <td>
+                        {% if user.email %}
+                            {{ user.email }}
+                        {% else %}
+                            Not provided
+                        {% endif %}
+                    </td>
+
+                </tr>
+
+
+            </tbody>
+
+        </table>
+
+
     {% else %}
-      <img src="https://via.placeholder.com/150?text=No+Image" class="profile-image" />
+
+
+        <!-- ============================= -->
+        <!-- PROFILE NOT FOUND -->
+        <!-- ============================= -->
+
+        <div class="alert alert-warning">
+
+            Student profile not found.
+
+        </div>
+
+
     {% endif %}
-    
-    <table class="table table-striped mt-3">
-      <tbody>
-        <tr>
-          <th scope="row">Username (Roll No.)</th>
-          <td>{{ user.username }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Student Name</th>
-          <td>{{ profile.student_name }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Semester</th>
-          <td>{{ profile.semester }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Branch</th>
-          <td>{{ profile.branch }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Email</th>
-          <td>{{ user.email|default:"Not provided" }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+
+
+    <!-- ============================= -->
+    <!-- BACK TO USER PANEL -->
+    <!-- ============================= -->
+
+    <div class="mt-4">
+
+        <a
+            href="{% url 'userpanel' %}"
+            class="btn btn-primary"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+</div>
+
 </body>
+
 </html>

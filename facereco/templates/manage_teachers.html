@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Manage Teachers</title>
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(
+                135deg,
+                #74ebd5 0%,
+                #ACB6E5 100%
+            );
+            min-height: 100vh;
+            padding-top: 90px;
+        }
+
+        .navbar {
+            background: linear-gradient(
+                135deg,
+                #0f2027,
+                #203a43,
+                #2c5364
+            );
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #ffd700 !important;
+        }
+
+        .page-header {
+            background: rgba(255,255,255,0.22);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow:
+                0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .page-header h1 {
+            color: white;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .page-header p {
+            color: #eeeeee;
+            margin: 5px 0 0;
+        }
+
+        .add-btn {
+            border: none;
+            background: linear-gradient(
+                135deg,
+                #7f00ff,
+                #e100ff
+            );
+
+            color: white;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-weight: 700;
+
+            box-shadow:
+                0 6px 20px rgba(127,0,255,0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .table-card {
+            background: rgba(255,255,255,0.90);
+            border-radius: 20px;
+            padding: 20px;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.15);
+
+            overflow-x: auto;
+        }
+
+        .table {
+            margin: 0;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background: #172a34;
+            color: white;
+            border: none;
+            padding: 15px;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 15px;
+        }
+
+        .teacher-name {
+            font-weight: 700;
+            color: #172a34;
+        }
+
+        .employee-id {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .subject-badge {
+            display: inline-block;
+            background: #eee7ff;
+            color: #6125c9;
+            padding: 5px 9px;
+            border-radius: 7px;
+            margin: 2px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .active-badge {
+            background: #d1fae5;
+            color: #047857;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .inactive-badge {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 7px 11px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .edit-btn {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(
+                135deg,
+                #0f2027,
+                #203a43
+            );
+            color: white;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 700;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #7f00ff;
+            box-shadow:
+                0 0 0 3px rgba(127,0,255,0.1);
+        }
+
+        .subjects-container {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 230px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .subject-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 9px 10px;
+            margin-bottom: 5px;
+
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .subject-option:hover {
+            background: #eee7ff;
+        }
+
+        .subject-option input {
+            width: 17px;
+            height: 17px;
+        }
+
+        .subject-info {
+            font-size: 13px;
+        }
+
+        .subject-name {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .subject-meta {
+            color: #777;
+        }
+
+        .no-subjects {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .search-box {
+            margin-bottom: 18px;
+        }
+
+        .message {
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================================================= -->
+<!-- NAVBAR -->
+<!-- ========================================================= -->
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand"
+            href="{% url 'adminpanel' %}"
+        >
+            Admin Panel
+        </a>
+
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+        >
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+
+        <div
+            class="collapse navbar-collapse"
+            id="navbarNav"
+        >
+
+            <ul class="navbar-nav ms-auto">
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'adminpanel' %}"
+                    >
+                        Dashboard
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'manage_students' %}"
+                    >
+                        Manage Users
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link active"
+                        href="{% url 'manage_teachers' %}"
+                    >
+                        Teachers
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'subjects' %}"
+                    >
+                        Subjects
+                    </a>
+
+                </li>
+
+
+                <li class="nav-item">
+
+                    <a
+                        class="nav-link"
+                        href="{% url 'timetable' %}"
+                    >
+                        Timetable
+                    </a>
+
+                </li>
+
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                👨‍🏫 Manage Teachers
+            </h1>
+
+            <p>
+                Add, update, delete and assign subjects to teachers.
+            </p>
+
+        </div>
+
+
+        <button
+            class="add-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#addTeacherModal"
+        >
+            + Add Teacher
+        </button>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- MESSAGES -->
+    <!-- ===================================================== -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div
+                class="alert alert-{{ message.tags }} message"
+            >
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- ===================================================== -->
+    <!-- SEARCH -->
+    <!-- ===================================================== -->
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="teacherSearch"
+            class="form-control"
+            placeholder="🔍 Search teacher, employee ID, username or branch..."
+        >
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- TEACHER TABLE -->
+    <!-- ===================================================== -->
+
+    <div class="table-card">
+
+        <table
+            class="table"
+            id="teacherTable"
+        >
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Teacher
+                    </th>
+
+                    <th>
+                        Employee ID
+                    </th>
+
+                    <th>
+                        Username
+                    </th>
+
+                    <th>
+                        Branch
+                    </th>
+
+                    <th>
+                        Subjects
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for teacher in teachers %}
+
+                <tr>
+
+
+                    <td>
+
+                        <div class="teacher-name">
+                            {{ teacher.user.get_full_name|default:teacher.user.username }}
+                        </div>
+
+                        <small class="text-muted">
+                            {{ teacher.user.email|default:"No email" }}
+                        </small>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="employee-id">
+                            {{ teacher.employee_id }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {{ teacher.user.username }}
+
+                    </td>
+
+
+                    <td>
+
+                        {{ teacher.branch }}
+
+                    </td>
+
+
+                    <td>
+
+                        {% for subject in teacher.subjects.all %}
+
+                            <span class="subject-badge">
+
+                                {{ subject.name }}
+
+                                — Sem {{ subject.semester }}
+
+                            </span>
+
+                        {% empty %}
+
+                            <span class="text-muted">
+                                No subjects
+                            </span>
+
+                        {% endfor %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if teacher.is_active %}
+
+                            <span class="active-badge">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="inactive-badge">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="action-btn edit-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editTeacher{{ teacher.id }}"
+                        >
+                            ✏️ Edit
+                        </button>
+
+
+                        <button
+                            class="action-btn delete-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteTeacher{{ teacher.id }}"
+                        >
+                            🗑️ Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="text-center py-5"
+                    >
+
+                        <h5>
+                            No teachers found
+                        </h5>
+
+                        <p class="text-muted">
+                            Click "Add Teacher" to create the first teacher.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- ADD TEACHER MODAL -->
+<!-- ========================================================= -->
+
+<div
+    class="modal fade"
+    id="addTeacherModal"
+    tabindex="-1"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    👨‍🏫 Add Teacher
+                </h5>
+
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{% url 'add_teacher' %}"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+
+                        <!-- NAME -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Teacher Name *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                placeholder="Enter teacher name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- EMPLOYEE ID -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Employee ID *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="employee_id"
+                                class="form-control"
+                                placeholder="EMP001"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- USERNAME -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Login Username *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="username"
+                                class="form-control"
+                                placeholder="Teacher login ID"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- PASSWORD -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Password *
+                            </label>
+
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="Create password"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control"
+                                placeholder="teacher@example.com"
+                            >
+
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                class="form-control"
+                                placeholder="Phone number"
+                            >
+
+                        </div>
+
+
+                        <!-- BRANCH -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Teacher Branch *
+                            </label>
+
+
+                            <select
+                                name="branch"
+                                id="addTeacherBranch"
+                                class="form-select teacher-branch"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Branch
+                                </option>
+
+
+                                {% for branch in branches %}
+
+                                    <option value="{{ branch }}">
+                                        {{ branch }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- SUBJECTS -->
+
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Assign Subjects
+                            </label>
+
+
+                            <div
+                                class="subjects-container"
+                                id="addSubjectsContainer"
+                            >
+
+                                <div class="no-subjects">
+                                    Select a branch first.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Create Teacher
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- EDIT TEACHER MODALS -->
+<!-- ========================================================= -->
+
+{% for teacher in teachers %}
+
+<div
+    class="modal fade"
+    id="editTeacher{{ teacher.id }}"
+    tabindex="-1"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    ✏️ Edit Teacher
+                </h5>
+
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <form
+                method="POST"
+                action="{% url 'update_teacher' teacher.id %}"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+
+                        <!-- NAME -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Teacher Name *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                value="{{ teacher.user.first_name }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- EMPLOYEE ID -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Employee ID *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="employee_id"
+                                class="form-control"
+                                value="{{ teacher.employee_id }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- USERNAME -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Username *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="username"
+                                class="form-control"
+                                value="{{ teacher.user.username }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- PASSWORD -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                New Password
+                            </label>
+
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="Leave blank to keep current"
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control"
+                                value="{{ teacher.user.email }}"
+                            >
+
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                class="form-control"
+                                value="{{ teacher.phone|default:'' }}"
+                            >
+
+                        </div>
+
+
+                        <!-- BRANCH -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Branch *
+                            </label>
+
+
+                            <select
+                                name="branch"
+                                class="form-select teacher-branch"
+                                data-teacher-id="{{ teacher.id }}"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Branch
+                                </option>
+
+
+                                {% for branch in branches %}
+
+                                    <option
+                                        value="{{ branch }}"
+                                        {% if teacher.branch|lower == branch|lower %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        {{ branch }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Account Status
+                            </label>
+
+
+                            <div class="form-check mt-2">
+
+                                <input
+                                    type="checkbox"
+                                    name="is_active"
+                                    class="form-check-input"
+                                    id="active{{ teacher.id }}"
+
+                                    {% if teacher.is_active %}
+                                        checked
+                                    {% endif %}
+                                >
+
+
+                                <label
+                                    class="form-check-label"
+                                    for="active{{ teacher.id }}"
+                                >
+                                    Active Teacher
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SUBJECTS -->
+
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Assign Subjects
+                            </label>
+
+
+                            <div
+                                class="subjects-container edit-subject-container"
+                                data-teacher-id="{{ teacher.id }}"
+                            >
+
+                                <div class="no-subjects">
+                                    Loading subjects...
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Changes
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DELETE TEACHER MODAL -->
+<!-- ========================================================= -->
+
+<div
+    class="modal fade"
+    id="deleteTeacher{{ teacher.id }}"
+    tabindex="-1"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Delete Teacher
+                </h5>
+
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body text-center p-4">
+
+                <h5>
+                    Are you sure?
+                </h5>
+
+
+                <p class="text-muted">
+
+                    You are about to delete
+
+                    <strong>
+                        {{ teacher.user.first_name }}
+                    </strong>
+
+                    permanently.
+
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Cancel
+                </button>
+
+
+                <form
+                    method="POST"
+                    action="{% url 'delete_teacher' teacher.id %}"
+                >
+
+                    {% csrf_token %}
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                    >
+                        Delete Teacher
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+
+<!-- ========================================================= -->
+<!-- ALL SUBJECT DATA -->
+<!-- ========================================================= -->
+
+<script>
+
+    const allSubjects = [
+
+        {% for subject in subjects %}
+
+        {
+            id: "{{ subject.id }}",
+            name: "{{ subject.name|escapejs }}",
+            semester: "{{ subject.semester|escapejs }}",
+            branch: "{{ subject.branch|escapejs }}"
+        },
+
+        {% endfor %}
+
+    ];
+
+</script>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   ADD TEACHER
+   BRANCH → SUBJECTS
+   ========================================================= */
+
+
+const addBranch =
+    document.getElementById("addTeacherBranch");
+
+
+const addSubjectsContainer =
+    document.getElementById("addSubjectsContainer");
+
+
+if (addBranch) {
+
+    addBranch.addEventListener(
+        "change",
+        function () {
+
+
+            const selectedBranch =
+                this.value.trim().toLowerCase();
+
+
+            addSubjectsContainer.innerHTML = "";
+
+
+            if (!selectedBranch) {
+
+                addSubjectsContainer.innerHTML = `
+
+                    <div class="no-subjects">
+                        Select a branch first.
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            const filteredSubjects =
+                allSubjects.filter(
+                    function (subject) {
+
+                        return subject.branch
+                            .trim()
+                            .toLowerCase()
+                            === selectedBranch;
+
+                    }
+                );
+
+
+            if (filteredSubjects.length === 0) {
+
+                addSubjectsContainer.innerHTML = `
+
+                    <div class="no-subjects">
+                        No active subjects found for this branch.
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            filteredSubjects.forEach(
+                function (subject) {
+
+
+                    const subjectDiv =
+                        document.createElement("div");
+
+
+                    subjectDiv.className =
+                        "subject-option";
+
+
+                    subjectDiv.innerHTML = `
+
+                        <input
+                            type="checkbox"
+                            name="subjects"
+                            value="${subject.id}"
+                            id="addSubject${subject.id}"
+                        >
+
+
+                        <label
+                            for="addSubject${subject.id}"
+                            class="subject-info"
+                            style="cursor:pointer;"
+                        >
+
+                            <div class="subject-name">
+                                ${subject.name}
+                            </div>
+
+
+                            <div class="subject-meta">
+                                Semester ${subject.semester}
+                                &nbsp;•&nbsp;
+                                ${subject.branch}
+                            </div>
+
+                        </label>
+
+                    `;
+
+
+                    addSubjectsContainer.appendChild(
+                        subjectDiv
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   EDIT TEACHER
+   BRANCH → SUBJECTS
+   ========================================================= */
+
+
+document
+    .querySelectorAll(
+        ".teacher-branch[data-teacher-id]"
+    )
+    .forEach(
+        function (branchSelect) {
+
+
+            const teacherId =
+                branchSelect.dataset.teacherId;
+
+
+            const container =
+                document.querySelector(
+                    `.edit-subject-container[data-teacher-id="${teacherId}"]`
+                );
+
+
+            if (!container) {
+                return;
+            }
+
+
+            const existingSelected = [
+
+                {% for teacher in teachers %}
+
+                    {% for subject in teacher.subjects.all %}
+
+                        "{{ teacher.id }}-{{ subject.id }}",
+
+                    {% endfor %}
+
+                {% endfor %}
+
+            ];
+
+
+            function loadEditSubjects() {
+
+
+                const selectedBranch =
+                    branchSelect.value
+                        .trim()
+                        .toLowerCase();
+
+
+                container.innerHTML = "";
+
+
+                if (!selectedBranch) {
+
+                    container.innerHTML = `
+
+                        <div class="no-subjects">
+                            Select a branch first.
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+                const filteredSubjects =
+                    allSubjects.filter(
+                        function (subject) {
+
+                            return subject.branch
+                                .trim()
+                                .toLowerCase()
+                                === selectedBranch;
+
+                        }
+                    );
+
+
+                if (filteredSubjects.length === 0) {
+
+                    container.innerHTML = `
+
+                        <div class="no-subjects">
+                            No active subjects found for this branch.
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+                filteredSubjects.forEach(
+                    function (subject) {
+
+
+                        const div =
+                            document.createElement("div");
+
+
+                        div.className =
+                            "subject-option";
+
+
+                        const isSelected =
+                            existingSelected.includes(
+                                teacherId +
+                                "-" +
+                                subject.id
+                            );
+
+
+                        div.innerHTML = `
+
+                            <input
+                                type="checkbox"
+                                name="subjects"
+                                value="${subject.id}"
+                                id="editSubject${teacherId}_${subject.id}"
+                                ${isSelected ? "checked" : ""}
+                            >
+
+
+                            <label
+                                for="editSubject${teacherId}_${subject.id}"
+                                class="subject-info"
+                                style="cursor:pointer;"
+                            >
+
+                                <div class="subject-name">
+                                    ${subject.name}
+                                </div>
+
+
+                                <div class="subject-meta">
+                                    Semester ${subject.semester}
+                                    &nbsp;•&nbsp;
+                                    ${subject.branch}
+                                </div>
+
+                            </label>
+
+                        `;
+
+
+                        container.appendChild(div);
+
+                    }
+                );
+
+            }
+
+
+            branchSelect.addEventListener(
+                "change",
+                loadEditSubjects
+            );
+
+
+            loadEditSubjects();
+
+        }
+    );
+
+
+/* =========================================================
+   SEARCH TEACHERS
+   ========================================================= */
+
+
+const searchInput =
+    document.getElementById("teacherSearch");
+
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+        "input",
+        function () {
+
+
+            const search =
+                this.value.toLowerCase().trim();
+
+
+            const rows =
+                document.querySelectorAll(
+                    "#teacherTable tbody tr"
+                );
+
+
+            rows.forEach(
+                function (row) {
+
+
+                    const text =
+                        row.innerText.toLowerCase();
+
+
+                    row.style.display =
+                        text.includes(search)
+                            ? ""
+                            : "none";
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+</script>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+</body>
+
+</html>

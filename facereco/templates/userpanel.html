@@ -179,7 +179,7 @@
     <div class="dashboard-content mb-4">
       <h1>Profile Info</h1>
       <p><strong>Name:</strong> {{ profile.student_name|default:user.get_full_name|default:user.username }}</p>
-      <p><strong>Email:</strong> {{ user.email }}</p>
+      
       <p><strong>Roll Number:</strong> {{ profile.roll_no|default:'N/A' }}</p>
       <p><strong>Branch:</strong> {{ profile.branch|default:'N/A' }}</p>
       <a href="{% url 'profile' %}" class="btn btn-warning mt-3">Edit Profile</a>

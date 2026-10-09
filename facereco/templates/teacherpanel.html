@@ -1,0 +1,2371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Panel | FaceAttend</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172a34;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 260px;
+            height: 100vh;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #0f2027,
+                    #203a43,
+                    #2c5364
+                );
+
+            color: white;
+
+            padding: 25px 18px;
+
+            z-index: 1000;
+
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h2 {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .logo p {
+            color: #b8c9d1;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .teacher-mini {
+            background: rgba(255,255,255,.10);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .teacher-mini h4 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .teacher-mini p {
+            font-size: 12px;
+            color: #c7d4d9;
+        }
+
+        .menu-title {
+            color: #9fb0b8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 18px 10px 8px;
+        }
+
+        .menu-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            border: none;
+            background: transparent;
+            color: #dce7eb;
+
+            padding: 12px 14px;
+            border-radius: 10px;
+
+            cursor: pointer;
+            text-align: left;
+
+            font-size: 14px;
+
+            margin-bottom: 4px;
+
+            transition: .2s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255,255,255,.12);
+            color: white;
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(
+                135deg,
+                #7f00ff,
+                #e100ff
+            );
+
+            color: white;
+
+            box-shadow:
+                0 5px 15px
+                rgba(127,0,255,.25);
+        }
+
+        .logout-btn {
+            margin-top: 20px;
+            color: #ffb4b4;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .date-box {
+            background: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+
+            box-shadow:
+                0 4px 15px rgba(0,0,0,.06);
+
+            color: #667;
+            font-size: 13px;
+        }
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* =========================
+           WELCOME
+        ========================= */
+
+        .welcome {
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f2027,
+                    #203a43,
+                    #2c5364
+                );
+
+            color: white;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,.12);
+        }
+
+        .welcome h2 {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #cbd9de;
+        }
+
+        /* =========================
+           STATS
+        ========================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 17px;
+
+            box-shadow:
+                0 7px 25px
+                rgba(0,0,0,.07);
+
+            transition: .2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 13px;
+            margin-top: 3px;
+        }
+
+        /* =========================
+           QUICK ACTIONS
+        ========================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 17px;
+            padding: 22px;
+
+            box-shadow:
+                0 7px 25px
+                rgba(0,0,0,.07);
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .action-btn {
+            width: 100%;
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7f00ff,
+                    #e100ff
+                );
+
+            color: white;
+
+            padding: 11px;
+
+            border-radius: 10px;
+
+            margin-top: 15px;
+
+            cursor: pointer;
+
+            font-weight: 700;
+        }
+
+        .action-btn:hover {
+            opacity: .9;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-card {
+            background: white;
+            border-radius: 17px;
+            padding: 20px;
+
+            box-shadow:
+                0 7px 25px
+                rgba(0,0,0,.07);
+
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #172a34;
+            color: white;
+            padding: 13px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        /* =========================
+           BADGES
+        ========================= */
+
+        .badge {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+        .badge-green {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-purple {
+            background: #eee7ff;
+            color: #6125c9;
+        }
+
+        .badge-blue {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        /* =========================
+           SUBJECT CARDS
+        ========================= */
+
+        .subject-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+        .subject-card {
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 17px;
+
+            box-shadow:
+                0 7px 25px
+                rgba(0,0,0,.07);
+
+            border-left: 5px solid #7f00ff;
+        }
+
+        .subject-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .subject-card p {
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* =========================
+           FORMS
+        ========================= */
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+
+            font-weight: 600;
+
+            margin-bottom: 7px;
+        }
+
+        .form-control,
+        .form-select {
+
+            width: 100%;
+
+            padding: 11px 13px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            outline: none;
+
+            font-size: 14px;
+
+            background: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #7f00ff;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(127,0,255,.1);
+        }
+
+        .filter-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr auto;
+
+            gap: 12px;
+
+            margin-bottom: 20px;
+        }
+
+        /* =========================
+           PROFILE
+        ========================= */
+
+        .profile-grid {
+            display: grid;
+
+            grid-template-columns:
+                180px 1fr;
+
+            gap: 25px;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7f00ff,
+                    #e100ff
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 55px;
+
+            color: white;
+        }
+
+        .profile-row {
+            display: grid;
+
+            grid-template-columns:
+                160px 1fr;
+
+            padding: 13px 0;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-label {
+            font-weight: 700;
+            color: #555;
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(0,0,0,.65);
+
+            z-index: 2000;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+
+            width: 100%;
+            max-width: 500px;
+
+            border-radius: 20px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 20px 70px
+                rgba(0,0,0,.3);
+        }
+
+        .modal h2 {
+            margin-bottom: 8px;
+        }
+
+        .modal-description {
+            color: #777;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #664d03;
+
+            padding: 13px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        .mobile-menu {
+            display: none;
+
+            position: fixed;
+
+            top: 15px;
+            left: 15px;
+
+            width: 45px;
+            height: 45px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #172a34;
+
+            color: white;
+
+            font-size: 22px;
+
+            z-index: 1500;
+        }
+
+        @media(max-width: 1000px) {
+
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .grid,
+            .subject-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                transform:
+                    translateX(-100%);
+
+                transition: .25s;
+            }
+
+            .sidebar.open {
+                transform:
+                    translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 80px 15px 30px;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .stats,
+            .grid,
+            .subject-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     MOBILE MENU
+===================================================== -->
+
+<button
+    class="mobile-menu"
+    onclick="toggleSidebar()"
+>
+    ☰
+</button>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside
+    class="sidebar"
+    id="sidebar"
+>
+
+
+    <div class="logo">
+
+        <h2>
+            🎓 FaceAttend
+        </h2>
+
+        <p>
+            Teacher Portal
+        </p>
+
+    </div>
+
+
+    <div class="teacher-mini">
+
+        <h4>
+            {{ teacher.user.get_full_name|default:teacher.user.username }}
+        </h4>
+
+        <p>
+            {{ teacher.employee_id }}
+        </p>
+
+        <p>
+            {{ teacher.branch }}
+        </p>
+
+    </div>
+
+
+    <div class="menu-title">
+        Main
+    </div>
+
+
+    <button
+        class="menu-btn active"
+        onclick="showSection('dashboard', this)"
+    >
+
+        🏠
+
+        Dashboard
+
+    </button>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('subjects', this)"
+    >
+
+        📚
+
+        My Subjects
+
+    </button>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('students', this)"
+    >
+
+        👨‍🎓
+
+        My Students
+
+    </button>
+
+
+    <div class="menu-title">
+        Attendance
+    </div>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('take-attendance', this)"
+    >
+
+        📷
+
+        Take Attendance
+
+    </button>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('attendance-records', this)"
+    >
+
+        📊
+
+        Attendance Records
+
+    </button>
+
+
+    <div class="menu-title">
+        Other
+    </div>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('timetable', this)"
+    >
+
+        🕐
+
+        Timetable
+
+    </button>
+
+
+    <button
+        class="menu-btn"
+        onclick="showSection('profile', this)"
+    >
+
+        👤
+
+        My Profile
+
+    </button>
+
+
+    <button
+        class="menu-btn"
+        onclick="openPasswordModal(false)"
+    >
+
+        🔐
+
+        Change Password
+
+    </button>
+
+
+    <button
+        class="menu-btn logout-btn"
+        onclick="logoutTeacher()"
+    >
+
+        🚪
+
+        Logout
+
+    </button>
+
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main">
+
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <div>
+
+            <h1 id="pageTitle">
+                Teacher Dashboard
+            </h1>
+
+        </div>
+
+
+        <div class="date-box">
+
+            📅
+
+            <span id="currentDate"></span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         DASHBOARD
+    ================================================= -->
+
+    <section
+        class="section active"
+        id="dashboard"
+    >
+
+
+        <div class="welcome">
+
+            <h2>
+                Welcome,
+                {{ teacher.user.first_name|default:teacher.user.username }}
+                👋
+            </h2>
+
+            <p>
+
+                Employee ID:
+                <strong>
+                    {{ teacher.employee_id }}
+                </strong>
+
+                &nbsp; • &nbsp;
+
+                Branch:
+                <strong>
+                    {{ teacher.branch }}
+                </strong>
+
+            </p>
+
+        </div>
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📚
+                </div>
+
+                <div class="stat-number">
+                    {{ subject_count|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Assigned Subjects
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👨‍🎓
+                </div>
+
+                <div class="stat-number">
+                    {{ students_count|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Students
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ✅
+                </div>
+
+                <div class="stat-number">
+                    {{ today_attendance|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Today's Attendance
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <div class="stat-number">
+                    {{ total_attendance|default:"0" }}
+                </div>
+
+                <div class="stat-label">
+                    Total Attendance
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="grid">
+
+
+            <div class="card">
+
+                <h3>
+                    📷 Take Attendance
+                </h3>
+
+                <p>
+                    Start face recognition attendance for your assigned subject.
+                </p>
+
+                <button
+                    class="action-btn"
+                    onclick="showSectionById('take-attendance')"
+                >
+                    Start Attendance
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    👨‍🎓 Students
+                </h3>
+
+                <p>
+                    View students from your assigned classes.
+                </p>
+
+                <button
+                    class="action-btn"
+                    onclick="showSectionById('students')"
+                >
+                    View Students
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    📊 Attendance
+                </h3>
+
+                <p>
+                    Check attendance records subject-wise and date-wise.
+                </p>
+
+                <button
+                    class="action-btn"
+                    onclick="showSectionById('attendance-records')"
+                >
+                    View Records
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =================================================
+         SUBJECTS
+    ================================================= -->
+
+    <section
+        class="section"
+        id="subjects"
+    >
+
+
+        <div class="table-header">
+
+            <h2>
+                📚 My Subjects
+            </h2>
+
+        </div>
+
+
+        <div class="subject-grid">
+
+
+            {% for subject in subjects %}
+
+            <div class="subject-card">
+
+                <h3>
+                    {{ subject.name }}
+                </h3>
+
+                <p>
+
+                    <span class="badge badge-purple">
+                        Semester {{ subject.semester }}
+                    </span>
+
+                </p>
+
+                <p>
+                    Branch:
+                    <strong>
+                        {{ subject.branch }}
+                    </strong>
+                </p>
+
+                <p>
+                    Status:
+                    <span class="badge badge-green">
+                        Active
+                    </span>
+                </p>
+
+            </div>
+
+            {% empty %}
+
+            <div class="card">
+
+                <h3>
+                    No Subjects
+                </h3>
+
+                <p>
+                    No subjects have been assigned to you yet.
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =================================================
+         STUDENTS
+    ================================================= -->
+
+    <section
+        class="section"
+        id="students"
+    >
+
+
+        <div class="table-card">
+
+
+            <div class="table-header">
+
+                <h2>
+                    👨‍🎓 My Students
+                </h2>
+
+            </div>
+
+
+            <div class="filter-row">
+
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="studentSearch"
+                    placeholder="Search student or roll number..."
+                    onkeyup="filterStudents()"
+                >
+
+
+                <select
+                    class="form-select"
+                    id="studentSemester"
+                    onchange="filterStudents()"
+                >
+
+                    <option value="">
+                        All Semesters
+                    </option>
+
+                    {% for subject in subjects %}
+
+                    <option value="{{ subject.semester }}">
+                        Semester {{ subject.semester }}
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Roll No
+                        </th>
+
+                        <th>
+                            Semester
+                        </th>
+
+                        <th>
+                            Branch
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="studentTable">
+
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>
+                            {{ student.student_name }}
+                        </td>
+
+                        <td>
+                            {{ student.roll_no }}
+                        </td>
+
+                        <td>
+                            {{ student.semester }}
+                        </td>
+
+                        <td>
+                            {{ student.branch }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            style="text-align:center;"
+                        >
+                            No students found.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =================================================
+         TAKE ATTENDANCE
+    ================================================= -->
+
+    <section class="section" id="take-attendance" > <div class="card"> 
+        <h2> 📷 Take Attendance </h2> 
+        <p> Start face recognition attendance using the existing attendance system. </p>
+         <button class="action-btn" type="button" onclick="startAttendance()" >
+             📷 Start Face Recognition </button> </div> <br> <div class="card"> 
+
+            <div
+                id="attendanceMessage"
+                style="
+                    margin-top:15px;
+                    color:#777;
+                "
+            ></div>
+
+
+        </div>
+
+
+        <br>
+
+
+        <div class="card">
+
+            <h3>
+                How Attendance Works
+            </h3>
+
+            <p>
+                1. Select your assigned subject.
+            </p>
+
+            <p>
+                2. Start the camera.
+            </p>
+
+            <p>
+                3. Student faces are matched with registered students.
+            </p>
+
+            <p>
+                4. Attendance is automatically recorded.
+            </p>
+
+            <p>
+                5. Duplicate attendance for the same student and subject is prevented.
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =================================================
+         ATTENDANCE RECORDS
+    ================================================= -->
+
+    <!-- =================================================
+     ATTENDANCE RECORDS
+===================================================== -->
+
+<section
+    class="section"
+    id="attendance-records"
+>
+
+
+    <div class="table-card">
+
+
+        <div class="table-header">
+
+            <h2>
+                📊 Attendance Records
+            </h2>
+
+        </div>
+
+
+        <div class="filter-row">
+
+
+            <select
+                class="form-select"
+                id="attendanceFilterSubject"
+                onchange="filterAttendance()"
+            >
+
+                <option value="">
+                    All Subjects
+                </option>
+
+                {% for subject in subjects %}
+
+                <option value="{{ subject.name|lower }}">
+                    {{ subject.name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <input
+                type="date"
+                class="form-control"
+                id="attendanceFilterDate"
+                onchange="filterAttendance()"
+            >
+
+
+            <button
+                type="button"
+                class="action-btn"
+                style="margin:0;"
+                onclick="filterAttendance()"
+            >
+                Filter
+            </button>
+
+
+            <button
+                type="button"
+                class="action-btn"
+                style="margin:0;"
+                onclick="clearAttendanceFilter()"
+            >
+                Clear
+            </button>
+
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Student
+                    </th>
+
+                    <th>
+                        Roll No
+                    </th>
+
+                    <th>
+                        Subject
+                    </th>
+
+                    <th>
+                        Semester
+                    </th>
+
+                    <th>
+                        Branch
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="attendanceTable">
+
+
+                {% for record in attendance_records %}
+
+                <tr
+                    data-subject="{{ record.subject.name|lower }}"
+                    data-date="{{ record.timestamp|date:'Y-m-d' }}"
+                >
+
+                    <td>
+
+                        {{ record.student.first_name|default:record.student.username }}
+
+                        {% if record.student.last_name %}
+                            {{ record.student.last_name }}
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ record.student.username }}
+                    </td>
+
+
+                    <td>
+                        {{ record.subject.name }}
+                    </td>
+
+
+                    <td>
+                        {{ record.subject.semester }}
+                    </td>
+
+
+                    <td>
+                        {{ record.subject.branch }}
+                    </td>
+
+
+                    <td>
+                        {{ record.timestamp|date:"d M Y" }}
+                    </td>
+
+
+                    <td>
+                        {{ record.timestamp|time:"h:i A" }}
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        style="
+                            text-align:center;
+                            padding:30px;
+                            color:#777;
+                        "
+                    >
+
+                        📭 No attendance records found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+    </div>
+
+
+</section>
+
+    <!-- =================================================
+         TIMETABLE
+    ================================================= -->
+
+    <section
+        class="section"
+        id="timetable"
+    >
+
+
+        <div class="table-card">
+
+
+            <div class="table-header">
+
+                <h2>
+                    🕐 My Timetable
+                </h2>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Day
+                        </th>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Subject
+                        </th>
+
+                        <th>
+                            Semester
+                        </th>
+
+                        <th>
+                            Room
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for item in timetable_entries %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.day }}
+                        </td>
+
+                        <td>
+                            {{ item.start_time }}
+                            -
+                            {{ item.end_time }}
+                        </td>
+
+                        <td>
+                            {{ item.subject.name }}
+                        </td>
+
+                        <td>
+                            {{ item.subject.semester }}
+                        </td>
+
+                        <td>
+                            {{ item.room|default:"-" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            style="text-align:center;padding:30px;"
+                        >
+
+                            No timetable has been created yet.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =================================================
+         PROFILE
+    ================================================= -->
+
+    <section
+        class="section"
+        id="profile"
+    >
+
+
+        <div class="card">
+
+
+            <div class="profile-grid">
+
+
+                <div>
+
+                    <div class="profile-avatar">
+                        👨‍🏫
+                    </div>
+
+                </div>
+
+
+                <div>
+
+
+                    <h2>
+                        {{ teacher.user.get_full_name|default:teacher.user.username }}
+                    </h2>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Employee ID
+                        </div>
+
+                        <div>
+                            {{ teacher.employee_id }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Username
+                        </div>
+
+                        <div>
+                            {{ teacher.user.username }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Email
+                        </div>
+
+                        <div>
+                            {{ teacher.user.email|default:"Not provided" }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Phone
+                        </div>
+
+                        <div>
+                            {{ teacher.phone|default:"Not provided" }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Branch
+                        </div>
+
+                        <div>
+                            {{ teacher.branch }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-row">
+
+                        <div class="profile-label">
+                            Status
+                        </div>
+
+                        <div>
+
+                            <span class="badge badge-green">
+                                Active
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+<!-- =====================================================
+     CHANGE PASSWORD MODAL
+===================================================== -->
+
+<div
+    class="modal-overlay"
+    id="passwordModal"
+>
+
+
+    <div class="modal">
+
+
+        <h2>
+            🔐 Change Password
+        </h2>
+
+
+        <p class="modal-description">
+            Create a new secure password for your teacher account.
+        </p>
+
+
+        <div
+            class="warning"
+            id="firstLoginWarning"
+            style="display:none;"
+        >
+
+            <strong>
+                First Login
+            </strong>
+
+            <br>
+
+            You must change your temporary password before using the teacher panel.
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{% url 'teacher_change_password' %}"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label>
+                    Current Password
+                </label>
+
+                <input
+                    type="password"
+                    name="old_password"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    New Password
+                </label>
+
+                <input
+                    type="password"
+                    name="new_password1"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Confirm New Password
+                </label>
+
+                <input
+                    type="password"
+                    name="new_password2"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="action-btn"
+            >
+                Change Password
+            </button>
+
+
+            <button
+                type="button"
+                class="menu-btn"
+                style="
+                    color:#555;
+                    margin-top:8px;
+                    justify-content:center;
+                "
+                onclick="closePasswordModal()"
+            >
+                Cancel
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =========================
+   DATE
+========================= */
+
+const dateElement =
+    document.getElementById(
+        "currentDate"
+    );
+
+
+dateElement.innerText =
+    new Date().toLocaleDateString(
+        "en-IN",
+        {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    );
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+function toggleSidebar() {
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+
+}
+
+
+/* =========================
+   SECTION SWITCH
+========================= */
+
+function showSection(
+    sectionId,
+    button
+) {
+
+
+    document
+        .querySelectorAll(".section")
+        .forEach(
+            function(section) {
+
+                section.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    if (section) {
+
+        section.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(".menu-btn")
+        .forEach(
+            function(btn) {
+
+                btn.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    if (button) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+
+    const titles = {
+
+        "dashboard":
+            "Teacher Dashboard",
+
+        "subjects":
+            "My Subjects",
+
+        "students":
+            "My Students",
+
+        "take-attendance":
+            "Take Attendance",
+
+        "attendance-records":
+            "Attendance Records",
+
+        "timetable":
+            "My Timetable",
+
+        "profile":
+            "My Profile"
+
+    };
+
+
+    document.getElementById(
+        "pageTitle"
+    ).innerText =
+        titles[sectionId]
+        || "Teacher Panel";
+
+
+    document
+        .getElementById("sidebar")
+        .classList.remove(
+            "open"
+        );
+
+}
+
+
+function showSectionById(
+    sectionId
+) {
+
+    const button =
+        document.querySelector(
+            `.menu-btn[onclick*="'${sectionId}'"]`
+        );
+
+
+    showSection(
+        sectionId,
+        button
+    );
+
+}
+
+
+/* =========================
+   STUDENT SEARCH
+========================= */
+
+function filterStudents() {
+
+
+    const search =
+        document
+            .getElementById(
+                "studentSearch"
+            )
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const semester =
+        document
+            .getElementById(
+                "studentSemester"
+            )
+            .value;
+
+
+    document
+        .querySelectorAll(
+            "#studentTable tr"
+        )
+        .forEach(
+            function(row) {
+
+
+                const text =
+                    row.innerText
+                        .toLowerCase();
+
+
+                const rowSemester =
+                    row.children[2]
+                    ? row.children[2]
+                        .innerText
+                        .trim()
+                    : "";
+
+
+                const searchMatch =
+                    text.includes(search);
+
+
+                const semesterMatch =
+                    !semester
+                    ||
+                    rowSemester === semester;
+
+
+                row.style.display =
+                    searchMatch &&
+                    semesterMatch
+                        ? ""
+                        : "none";
+
+            }
+        );
+
+}
+
+
+/* =========================
+   ATTENDANCE FILTER
+========================= */
+
+/* =========================
+   ATTENDANCE FILTER
+========================= */
+
+function filterAttendance() {
+
+
+    const subject =
+        document
+            .getElementById(
+                "attendanceFilterSubject"
+            )
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const date =
+        document
+            .getElementById(
+                "attendanceFilterDate"
+            )
+            .value;
+
+
+    document
+        .querySelectorAll(
+            "#attendanceTable tr"
+        )
+        .forEach(
+            function(row) {
+
+
+                const rowSubject =
+                    (
+                        row.dataset.subject
+                        || ""
+                    )
+                    .toLowerCase()
+                    .trim();
+
+
+                const rowDate =
+                    row.dataset.date
+                    || "";
+
+
+                const subjectMatch =
+                    !subject
+                    ||
+                    rowSubject === subject;
+
+
+                const dateMatch =
+                    !date
+                    ||
+                    rowDate === date;
+
+
+                row.style.display =
+                    subjectMatch &&
+                    dateMatch
+                        ? ""
+                        : "none";
+
+            }
+        );
+
+}
+function clearAttendanceFilter() {
+
+    document
+        .getElementById(
+            "attendanceFilterSubject"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "attendanceFilterDate"
+        )
+        .value = "";
+
+
+    filterAttendance();
+
+}
+
+
+/* =========================
+   ATTENDANCE
+========================= */
+
+function startAttendance() { window.location.href = "{% url 'liveattendance' %}"; }
+
+
+/* =========================
+   PASSWORD MODAL
+========================= */
+
+function openPasswordModal(
+    forced
+) {
+
+
+    const modal =
+        document.getElementById(
+            "passwordModal"
+        );
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    if (forced) {
+
+        document.getElementById(
+            "firstLoginWarning"
+        ).style.display =
+            "block";
+
+    }
+
+}
+
+
+function closePasswordModal() {
+
+
+    document
+        .getElementById(
+            "passwordModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logoutTeacher() {
+
+    window.location.href =
+        "{% url 'teacher_logout' %}";
+
+}
+
+
+/* =========================
+   FIRST LOGIN
+========================= */
+
+{% if teacher.must_change_password %}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        openPasswordModal(true);
+
+    }
+);
+
+{% endif %}
+
+
+</script>
+
+
+</body>
+
+</html>
