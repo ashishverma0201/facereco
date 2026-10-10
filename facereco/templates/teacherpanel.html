@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -712,6 +712,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
 
@@ -725,8 +726,7 @@
 <button
     class="mobile-menu"
     onclick="toggleSidebar()"
->
-    ☰
+>Menu
 </button>
 
 
@@ -743,7 +743,7 @@
     <div class="logo">
 
         <h2>
-            🎓 FaceAttend
+             FaceAttend
         </h2>
 
         <p>
@@ -780,7 +780,7 @@
         onclick="showSection('dashboard', this)"
     >
 
-        🏠
+        
 
         Dashboard
 
@@ -792,7 +792,7 @@
         onclick="showSection('subjects', this)"
     >
 
-        📚
+        
 
         My Subjects
 
@@ -804,7 +804,7 @@
         onclick="showSection('students', this)"
     >
 
-        👨‍🎓
+        
 
         My Students
 
@@ -821,7 +821,7 @@
         onclick="showSection('take-attendance', this)"
     >
 
-        📷
+        
 
         Take Attendance
 
@@ -833,7 +833,7 @@
         onclick="showSection('attendance-records', this)"
     >
 
-        📊
+        
 
         Attendance Records
 
@@ -844,13 +844,19 @@
         Other
     </div>
 
+    <button class="menu-btn" onclick="showSection('tests', this)">Tests &amp; Marks</button>
+    <button class="menu-btn" onclick="showSection('homework', this)">Homework &amp; Diary</button>
+    <button class="menu-btn" onclick="showSection('parent-messages', this)">Parent Messages</button>
+    <button class="menu-btn" onclick="showSection('student-leaves', this)">Student Leave Requests</button>
+    <button class="menu-btn" onclick="showSection('my-leave', this)">My Leave</button>
+
 
     <button
         class="menu-btn"
         onclick="showSection('timetable', this)"
     >
 
-        🕐
+        
 
         Timetable
 
@@ -862,7 +868,7 @@
         onclick="showSection('profile', this)"
     >
 
-        👤
+        
 
         My Profile
 
@@ -874,23 +880,23 @@
         onclick="openPasswordModal(false)"
     >
 
-        🔐
+        
 
         Change Password
 
     </button>
 
 
-    <button
-        class="menu-btn logout-btn"
-        onclick="logoutTeacher()"
-    >
+    <form method="post" action="{% url 'teacher_logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="menu-btn logout-btn">
 
-        🚪
+        
 
         Logout
 
-    </button>
+        </button>
+    </form>
 
 
 </aside>
@@ -902,6 +908,14 @@
 
 <main class="main">
 
+
+    {% if messages %}
+    <div style="margin:0 0 16px;">
+        {% for message in messages %}
+        <div class="card" role="status" style="padding:12px 16px;">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- TOP BAR -->
 
@@ -918,7 +932,7 @@
 
         <div class="date-box">
 
-            📅
+            
 
             <span id="currentDate"></span>
 
@@ -942,7 +956,7 @@
             <h2>
                 Welcome,
                 {{ teacher.user.first_name|default:teacher.user.username }}
-                👋
+                
             </h2>
 
             <p>
@@ -952,7 +966,7 @@
                     {{ teacher.employee_id }}
                 </strong>
 
-                &nbsp; • &nbsp;
+                &nbsp;  &nbsp;
 
                 Branch:
                 <strong>
@@ -972,7 +986,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon">
-                    📚
+                    
                 </div>
 
                 <div class="stat-number">
@@ -989,7 +1003,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon">
-                    👨‍🎓
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1006,7 +1020,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon">
-                    ✅
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1023,7 +1037,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon">
-                    📊
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1048,7 +1062,7 @@
             <div class="card">
 
                 <h3>
-                    📷 Take Attendance
+                     Take Attendance
                 </h3>
 
                 <p>
@@ -1068,7 +1082,7 @@
             <div class="card">
 
                 <h3>
-                    👨‍🎓 Students
+                     Students
                 </h3>
 
                 <p>
@@ -1088,7 +1102,7 @@
             <div class="card">
 
                 <h3>
-                    📊 Attendance
+                     Attendance
                 </h3>
 
                 <p>
@@ -1105,9 +1119,77 @@
             </div>
 
 
+            <div class="card">
+                <h3>Announcements</h3>
+                <p>Share updates with students in your assigned semesters.</p>
+                <button class="action-btn" onclick="showSectionById('announcements')">Manage Announcements</button>
+            </div>
+
+            <div class="card">
+                <h3>Tests &amp; Marks</h3>
+                <p>Publish test details and enter marks for your students.</p>
+                <button class="action-btn" onclick="showSectionById('tests')">Manage Tests</button>
+            </div>
+
+            <div class="card">
+                <h3>Leave Requests</h3>
+                <p>Review and approve or reject student leave applications.</p>
+                <button class="action-btn" onclick="showSectionById('student-leaves')">Review Leaves</button>
+            </div>
+
+            <div class="card">
+                <h3>My Leave</h3>
+                <p>Apply for your own leave and check the admin's decision.</p>
+                <button class="action-btn" onclick="showSectionById('my-leave')">Apply for Leave</button>
+            </div>
+
+
         </div>
 
 
+    </section>
+
+    <section class="section" id="announcements">
+        <div class="card" style="padding:24px; margin-bottom:22px;">
+            <h2>Post an announcement</h2>
+            <p>Teacher announcements from the admin will appear below. Your posts are sent to students in the selected semester and your branch.</p>
+            {% if announcement_semesters %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_announcement">
+                <div class="form-group">
+                    <label for="announcement-title">Title</label>
+                    <input id="announcement-title" class="form-control" type="text" name="title" maxlength="150" required>
+                </div>
+                <div class="form-group">
+                    <label for="announcement-semester">Semester</label>
+                    <select id="announcement-semester" class="form-select" name="semester" required>
+                        {% for semester in announcement_semesters %}
+                        <option value="{{ semester }}">Semester {{ semester }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="announcement-message">Message</label>
+                    <textarea id="announcement-message" class="form-control" name="message" rows="4" required></textarea>
+                </div>
+                <button class="action-btn" type="submit">Post announcement</button>
+            </form>
+            {% else %}
+            <p>No active assigned subjects are available for announcements.</p>
+            {% endif %}
+        </div>
+
+        <div class="card" style="padding:24px;">
+            <h2>Recent announcements for teachers</h2>
+            {% for announcement in announcements %}
+            <article style="padding:14px 0; border-bottom:1px solid #e5e7eb;">
+                <strong>{{ announcement.title }}</strong>
+                <div>For teachers  {{ announcement.created_at|date:"M j, Y, g:i a" }}{% if announcement.created_by %}  {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}{% endif %}</div>
+                <p style="white-space:pre-wrap; margin:8px 0 0;">{{ announcement.message }}</p>
+            </article>
+            {% empty %}<p>No announcements from the admin yet.</p>{% endfor %}
+        </div>
     </section>
 
 
@@ -1124,7 +1206,7 @@
         <div class="table-header">
 
             <h2>
-                📚 My Subjects
+                 My Subjects
             </h2>
 
         </div>
@@ -1204,7 +1286,7 @@
             <div class="table-header">
 
                 <h2>
-                    👨‍🎓 My Students
+                     My Students
                 </h2>
 
             </div>
@@ -1330,10 +1412,10 @@
     ================================================= -->
 
     <section class="section" id="take-attendance" > <div class="card"> 
-        <h2> 📷 Take Attendance </h2> 
+        <h2>  Take Attendance </h2> 
         <p> Start face recognition attendance using the existing attendance system. </p>
          <button class="action-btn" type="button" onclick="startAttendance()" >
-             📷 Start Face Recognition </button> </div> <br> <div class="card"> 
+              Start Face Recognition </button> </div> <br> <div class="card"> 
 
             <div
                 id="attendanceMessage"
@@ -1402,7 +1484,7 @@
         <div class="table-header">
 
             <h2>
-                📊 Attendance Records
+                 Attendance Records
             </h2>
 
         </div>
@@ -1568,7 +1650,7 @@
                         "
                     >
 
-                        📭 No attendance records found.
+                         No attendance records found.
 
                     </td>
 
@@ -1603,7 +1685,7 @@
             <div class="table-header">
 
                 <h2>
-                    🕐 My Timetable
+                     My Timetable
                 </h2>
 
             </div>
@@ -1719,7 +1801,7 @@
                 <div>
 
                     <div class="profile-avatar">
-                        👨‍🏫
+                        
                     </div>
 
                 </div>
@@ -1826,8 +1908,42 @@
 
     </section>
 
+    {% include "teacher_tests_section.html" %}
+    {% include "teacher_homework_section.html" %}
+    {% include "teacher_parent_messages_section.html" %}
+    {% include "teacher_student_leaves_section.html" %}
+    {% include "teacher_own_leave_section.html" %}
 
 </main>
+
+{% if unread_announcements or unread_dashboard_notices %}
+<div id="unreadAnnouncementsModal" class="modal-overlay" style="display:flex; z-index:10000;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="unreadAnnouncementsTitle" style="max-width:680px; max-height:85vh; overflow-y:auto;">
+        <h2 id="unreadAnnouncementsTitle">New updates for you</h2>
+        <form id="teacherAnnouncementReadForm" method="post" action="{% url 'mark_announcements_read' %}">
+            {% csrf_token %}
+            {% for announcement in unread_announcements %}<input type="hidden" name="announcement_ids" value="{{ announcement.pk }}">{% endfor %}
+            {% for notice in unread_dashboard_notices %}<input type="hidden" name="notice_keys" value="{{ notice.key }}">{% endfor %}
+            {% for announcement in unread_announcements %}
+            <article style="padding:14px 0; border-bottom:1px solid #e5e7eb;">
+                <strong>Audience: Teachers</strong>
+                <h3 style="font-size:18px; margin:8px 0;">{{ announcement.title }}</h3>
+                <p style="white-space:pre-wrap;">{{ announcement.message }}</p>
+                <small>{{ announcement.created_at|date:"M j, Y, g:i a" }}{% if announcement.created_by %}  {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}{% endif %}</small>
+            </article>
+            {% endfor %}
+            {% for notice in unread_dashboard_notices %}
+            <article style="padding:14px 0; border-bottom:1px solid #e5e7eb;">
+                <strong>{{ notice.type }}</strong>
+                <h3 style="font-size:18px; margin:8px 0;">{{ notice.title }}</h3>
+                <p>{{ notice.detail }}</p>
+            </article>
+            {% endfor %}
+        </form>
+        <button class="action-btn" type="button" style="margin-top:16px;" onclick="closeUnreadAnnouncements()">Got it</button>
+    </div>
+</div>
+{% endif %}
 
 
 <!-- =====================================================
@@ -1844,7 +1960,7 @@
 
 
         <h2>
-            🔐 Change Password
+             Change Password
         </h2>
 
 
@@ -2075,6 +2191,24 @@ function showSection(
         "attendance-records":
             "Attendance Records",
 
+        "tests":
+            "Tests & Marks",
+
+        "homework":
+            "Homework & Diary",
+
+        "parent-messages":
+            "Parent Messages",
+
+        "student-leaves":
+            "Student Leave Requests",
+
+        "my-leave":
+            "My Leave",
+
+        "announcements":
+            "Announcements",
+
         "timetable":
             "My Timetable",
 
@@ -2115,6 +2249,11 @@ function showSectionById(
         button
     );
 
+}
+
+const sectionFromQuery = new URLSearchParams(window.location.search).get("section");
+if (["tests", "homework", "parent-messages", "student-leaves", "my-leave"].includes(sectionFromQuery)) {
+    showSectionById(sectionFromQuery);
 }
 
 
@@ -2333,15 +2472,14 @@ function closePasswordModal() {
 }
 
 
-/* =========================
-   LOGOUT
-========================= */
-
-function logoutTeacher() {
-
-    window.location.href =
-        "{% url 'teacher_logout' %}";
-
+function closeUnreadAnnouncements() {
+    document.getElementById("unreadAnnouncementsModal").style.display = "none";
+    const readForm = document.getElementById("teacherAnnouncementReadForm");
+    fetch(readForm.action, {
+        method: "POST",
+        body: new FormData(readForm),
+        headers: {"X-Requested-With": "XMLHttpRequest"}
+    });
 }
 
 

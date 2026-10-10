@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -88,6 +88,7 @@
             }
         }
     </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 <body>
     <div class="login-container">
@@ -121,6 +122,8 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
+        <p class="text-center mt-3 mb-0"><a href="{% url 'student_forgot_password' %}">Forgot student password?</a></p>
+        <p class="text-center mt-3 mb-0">Parent? <a href="{% url 'parent_login' %}">Open Parent Login</a></p>
     </div>
 </body>
 </html>

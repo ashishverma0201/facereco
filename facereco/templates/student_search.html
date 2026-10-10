@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -23,11 +23,12 @@
     .percentage-high { color: #28a745; font-weight: bold; }
     .percentage-low { color: #dc3545; font-weight: bold; }
   </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 <body class="container mt-5">
 
   <div class="card">
-    <h2 class="mb-4 text-center">🔍 Search Student Attendance</h2>
+    <h2 class="mb-4 text-center"> Search Student Attendance</h2>
 
     <!-- Search Form -->
     <form method="POST" class="mb-4">
@@ -69,6 +70,7 @@
         <tr>
           <th>Subject</th>
           <th>Attended</th>
+          <th>Approved Leave Credit</th>
           <th>Total Classes</th>
           <th>Percentage</th>
         </tr>
@@ -78,6 +80,7 @@
         <tr>
           <td>{{ item.name }}</td>
           <td>{{ item.attended }}</td>
+          <td>{{ item.leave_credited }}</td>
           <td>{{ item.total }}</td>
           <td>
             <span class="{% if item.percentage >= 75 %}percentage-high{% else %}percentage-low{% endif %}">

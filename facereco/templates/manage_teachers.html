@@ -1,3 +1,4 @@
+﻿
 <!DOCTYPE html>
 <html lang="en">
 
@@ -299,6 +300,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
 
@@ -424,7 +426,7 @@
         <div>
 
             <h1>
-                👨‍🏫 Manage Teachers
+                 Manage Teachers
             </h1>
 
             <p>
@@ -474,7 +476,7 @@
             type="text"
             id="teacherSearch"
             class="form-control"
-            placeholder="🔍 Search teacher, employee ID, username or branch..."
+            placeholder=" Search teacher, employee ID, username or branch..."
         >
 
     </div>
@@ -566,7 +568,17 @@
 
                     <td>
 
-                        {{ teacher.branch }}
+                        {% for teacher_branch in teacher.branches.all %}
+
+                            <span class="subject-badge">
+                                {{ teacher_branch.name }}
+                            </span>
+
+                        {% empty %}
+
+                            {{ teacher.branch }}
+
+                        {% endfor %}
 
                     </td>
 
@@ -579,7 +591,7 @@
 
                                 {{ subject.name }}
 
-                                — Sem {{ subject.semester }}
+                                 Sem {{ subject.semester }}
 
                             </span>
 
@@ -620,7 +632,7 @@
                             data-bs-toggle="modal"
                             data-bs-target="#editTeacher{{ teacher.id }}"
                         >
-                            ✏️ Edit
+                             Edit
                         </button>
 
 
@@ -629,7 +641,7 @@
                             data-bs-toggle="modal"
                             data-bs-target="#deleteTeacher{{ teacher.id }}"
                         >
-                            🗑️ Delete
+                             Delete
                         </button>
 
                     </td>
@@ -687,7 +699,7 @@
             <div class="modal-header">
 
                 <h5 class="modal-title">
-                    👨‍🏫 Add Teacher
+                     Add Teacher
                 </h5>
 
 
@@ -825,7 +837,7 @@
                         </div>
 
 
-                        <!-- BRANCH -->
+                        <!-- MULTIPLE BRANCHES -->
 
                         <div class="col-md-6">
 
@@ -833,28 +845,26 @@
                                 Teacher Branch *
                             </label>
 
-
-                            <select
-                                name="branch"
-                                id="addTeacherBranch"
-                                class="form-select teacher-branch"
-                                required
-                            >
-
-                                <option value="">
-                                    Select Branch
-                                </option>
-
+                            <div id="addTeacherBranch">
 
                                 {% for branch in branches %}
 
-                                    <option value="{{ branch }}">
+                                    <label style="display:block; margin:8px 0;">
+
+                                        <input
+                                            type="checkbox"
+                                            name="branches"
+                                            value="{{ branch }}"
+                                            class="add-branch-checkbox"
+                                        >
+
                                         {{ branch }}
-                                    </option>
+
+                                    </label>
 
                                 {% endfor %}
 
-                            </select>
+                            </div>
 
                         </div>
 
@@ -939,7 +949,7 @@
             <div class="modal-header">
 
                 <h5 class="modal-title">
-                    ✏️ Edit Teacher
+                     Edit Teacher
                 </h5>
 
 
@@ -1076,7 +1086,7 @@
                         </div>
 
 
-                        <!-- BRANCH -->
+                        <!-- MULTIPLE BRANCHES -->
 
                         <div class="col-md-6">
 
@@ -1084,35 +1094,33 @@
                                 Branch *
                             </label>
 
-
-                            <select
-                                name="branch"
-                                class="form-select teacher-branch"
+                            <div
+                                class="edit-branch-container"
                                 data-teacher-id="{{ teacher.id }}"
-                                required
                             >
-
-                                <option value="">
-                                    Select Branch
-                                </option>
-
 
                                 {% for branch in branches %}
 
-                                    <option
-                                        value="{{ branch }}"
-                                        {% if teacher.branch|lower == branch|lower %}
-                                            selected
-                                        {% endif %}
-                                    >
+                                    <label style="display:block; margin:8px 0;">
+
+                                        <input
+                                            type="checkbox"
+                                            name="branches"
+                                            value="{{ branch }}"
+                                            class="edit-branch-checkbox"
+                                            {% if teacher.branch|lower == branch|lower %}checked{% endif %}
+                                            {% for teacher_branch in teacher.branches.all %}
+                                                {% if teacher_branch.name|lower == branch|lower %}checked{% endif %}
+                                            {% endfor %}
+                                        >
 
                                         {{ branch }}
 
-                                    </option>
+                                    </label>
 
                                 {% endfor %}
 
-                            </select>
+                            </div>
 
                         </div>
 
@@ -1338,8 +1346,165 @@
 
 
 /* =========================================================
+   MULTIPLE BRANCHES  SUBJECTS
+   ========================================================= */
+
+
+function getSelectedBranches(container) {
+
+    return Array.from(
+        container.querySelectorAll('input[name="branches"]:checked')
+    ).map(function (checkbox) {
+
+        return checkbox.value.trim().toLowerCase();
+
+    });
+
+}
+
+function escapeHTML(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (character) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;"
+        }[character];
+    });
+}
+
+
+function showSubjects(
+    container,
+    selectedBranches,
+    teacherId = null,
+    existingSelected = []
+) {
+
+    // Preserve currently checked subjects when branch selection changes.
+    const currentSelections = Array.from(
+        container.querySelectorAll('input[name="subjects"]:checked')
+    ).map(function (checkbox) {
+
+        return checkbox.value;
+
+    });
+
+    const selectedSubjectIds = new Set(currentSelections);
+
+    if (teacherId !== null) {
+
+        existingSelected.forEach(function (item) {
+
+            const prefix = teacherId + "-";
+
+            if (item.startsWith(prefix)) {
+
+                selectedSubjectIds.add(item.substring(prefix.length));
+
+            }
+
+        });
+
+    }
+
+    container.innerHTML = "";
+
+    if (selectedBranches.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="no-subjects">
+                Select a branch first.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    const filteredSubjects = allSubjects.filter(
+        function (subject) {
+
+            return selectedBranches.includes(
+                subject.branch.trim().toLowerCase()
+            );
+
+        }
+    );
+
+    if (filteredSubjects.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="no-subjects">
+                No active subjects found for the selected branches.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    filteredSubjects.forEach(
+        function (subject) {
+
+            const div = document.createElement("div");
+
+            div.className = "subject-option";
+
+            const subjectId = teacherId === null
+                ? "addSubject" + subject.id
+                : "editSubject" + teacherId + "_" + subject.id;
+
+            const isSelected = selectedSubjectIds.has(
+                String(subject.id)
+            );
+
+            div.innerHTML = `
+
+                <input
+                    type="checkbox"
+                    name="subjects"
+                    value="${subject.id}"
+                    id="${subjectId}"
+                    ${isSelected ? "checked" : ""}
+                >
+
+                <label
+                    for="${subjectId}"
+                    class="subject-info"
+                    style="cursor:pointer;"
+                >
+
+                    <div class="subject-name">
+                        ${escapeHTML(subject.name)}
+                    </div>
+
+                    <div class="subject-meta">
+                        Semester ${escapeHTML(subject.semester)}
+                        &nbsp;&nbsp;
+                        ${escapeHTML(subject.branch)}
+                    </div>
+
+                </label>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    ADD TEACHER
-   BRANCH → SUBJECTS
+   BRANCH  SUBJECTS
    ========================================================= */
 
 
@@ -1351,110 +1516,18 @@ const addSubjectsContainer =
     document.getElementById("addSubjectsContainer");
 
 
-if (addBranch) {
+if (addBranch && addSubjectsContainer) {
 
     addBranch.addEventListener(
         "change",
         function () {
 
+            const selectedBranches =
+                getSelectedBranches(addBranch);
 
-            const selectedBranch =
-                this.value.trim().toLowerCase();
-
-
-            addSubjectsContainer.innerHTML = "";
-
-
-            if (!selectedBranch) {
-
-                addSubjectsContainer.innerHTML = `
-
-                    <div class="no-subjects">
-                        Select a branch first.
-                    </div>
-
-                `;
-
-                return;
-            }
-
-
-            const filteredSubjects =
-                allSubjects.filter(
-                    function (subject) {
-
-                        return subject.branch
-                            .trim()
-                            .toLowerCase()
-                            === selectedBranch;
-
-                    }
-                );
-
-
-            if (filteredSubjects.length === 0) {
-
-                addSubjectsContainer.innerHTML = `
-
-                    <div class="no-subjects">
-                        No active subjects found for this branch.
-                    </div>
-
-                `;
-
-                return;
-            }
-
-
-            filteredSubjects.forEach(
-                function (subject) {
-
-
-                    const subjectDiv =
-                        document.createElement("div");
-
-
-                    subjectDiv.className =
-                        "subject-option";
-
-
-                    subjectDiv.innerHTML = `
-
-                        <input
-                            type="checkbox"
-                            name="subjects"
-                            value="${subject.id}"
-                            id="addSubject${subject.id}"
-                        >
-
-
-                        <label
-                            for="addSubject${subject.id}"
-                            class="subject-info"
-                            style="cursor:pointer;"
-                        >
-
-                            <div class="subject-name">
-                                ${subject.name}
-                            </div>
-
-
-                            <div class="subject-meta">
-                                Semester ${subject.semester}
-                                &nbsp;•&nbsp;
-                                ${subject.branch}
-                            </div>
-
-                        </label>
-
-                    `;
-
-
-                    addSubjectsContainer.appendChild(
-                        subjectDiv
-                    );
-
-                }
+            showSubjects(
+                addSubjectsContainer,
+                selectedBranches
             );
 
         }
@@ -1465,167 +1538,60 @@ if (addBranch) {
 
 /* =========================================================
    EDIT TEACHER
-   BRANCH → SUBJECTS
+   BRANCH  SUBJECTS
    ========================================================= */
 
 
-document
-    .querySelectorAll(
-        ".teacher-branch[data-teacher-id]"
-    )
-    .forEach(
-        function (branchSelect) {
+const existingSelected = [
 
+    {% for teacher in teachers %}
+
+        {% for subject in teacher.subjects.all %}
+
+            "{{ teacher.id }}-{{ subject.id }}",
+
+        {% endfor %}
+
+    {% endfor %}
+
+];
+
+
+document
+    .querySelectorAll(".edit-branch-container")
+    .forEach(
+        function (branchContainer) {
 
             const teacherId =
-                branchSelect.dataset.teacherId;
-
+                branchContainer.dataset.teacherId;
 
             const container =
                 document.querySelector(
                     `.edit-subject-container[data-teacher-id="${teacherId}"]`
                 );
 
-
             if (!container) {
                 return;
             }
 
-
-            const existingSelected = [
-
-                {% for teacher in teachers %}
-
-                    {% for subject in teacher.subjects.all %}
-
-                        "{{ teacher.id }}-{{ subject.id }}",
-
-                    {% endfor %}
-
-                {% endfor %}
-
-            ];
-
-
             function loadEditSubjects() {
 
+                const selectedBranches =
+                    getSelectedBranches(branchContainer);
 
-                const selectedBranch =
-                    branchSelect.value
-                        .trim()
-                        .toLowerCase();
-
-
-                container.innerHTML = "";
-
-
-                if (!selectedBranch) {
-
-                    container.innerHTML = `
-
-                        <div class="no-subjects">
-                            Select a branch first.
-                        </div>
-
-                    `;
-
-                    return;
-                }
-
-
-                const filteredSubjects =
-                    allSubjects.filter(
-                        function (subject) {
-
-                            return subject.branch
-                                .trim()
-                                .toLowerCase()
-                                === selectedBranch;
-
-                        }
-                    );
-
-
-                if (filteredSubjects.length === 0) {
-
-                    container.innerHTML = `
-
-                        <div class="no-subjects">
-                            No active subjects found for this branch.
-                        </div>
-
-                    `;
-
-                    return;
-                }
-
-
-                filteredSubjects.forEach(
-                    function (subject) {
-
-
-                        const div =
-                            document.createElement("div");
-
-
-                        div.className =
-                            "subject-option";
-
-
-                        const isSelected =
-                            existingSelected.includes(
-                                teacherId +
-                                "-" +
-                                subject.id
-                            );
-
-
-                        div.innerHTML = `
-
-                            <input
-                                type="checkbox"
-                                name="subjects"
-                                value="${subject.id}"
-                                id="editSubject${teacherId}_${subject.id}"
-                                ${isSelected ? "checked" : ""}
-                            >
-
-
-                            <label
-                                for="editSubject${teacherId}_${subject.id}"
-                                class="subject-info"
-                                style="cursor:pointer;"
-                            >
-
-                                <div class="subject-name">
-                                    ${subject.name}
-                                </div>
-
-
-                                <div class="subject-meta">
-                                    Semester ${subject.semester}
-                                    &nbsp;•&nbsp;
-                                    ${subject.branch}
-                                </div>
-
-                            </label>
-
-                        `;
-
-
-                        container.appendChild(div);
-
-                    }
+                showSubjects(
+                    container,
+                    selectedBranches,
+                    teacherId,
+                    existingSelected
                 );
 
             }
 
-
-            branchSelect.addEventListener(
+            branchContainer.addEventListener(
                 "change",
                 loadEditSubjects
             );
-
 
             loadEditSubjects();
 
@@ -1648,24 +1614,19 @@ if (searchInput) {
         "input",
         function () {
 
-
             const search =
                 this.value.toLowerCase().trim();
-
 
             const rows =
                 document.querySelectorAll(
                     "#teacherTable tbody tr"
                 );
 
-
             rows.forEach(
                 function (row) {
 
-
                     const text =
                         row.innerText.toLowerCase();
-
 
                     row.style.display =
                         text.includes(search)
@@ -1692,3 +1653,4 @@ if (searchInput) {
 </body>
 
 </html>
+

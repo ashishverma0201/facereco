@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -46,6 +46,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
 
@@ -72,7 +73,7 @@
         {% if profile.face_image %}
 
             <img
-                src="{{ profile.face_image.url }}"
+                src="{% url 'private_file' 'student-face' profile.pk %}"
                 alt="Face Image"
                 class="profile-image"
             >

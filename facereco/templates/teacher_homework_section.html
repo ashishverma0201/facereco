@@ -1,0 +1,51 @@
+﻿<section class="section" id="homework">
+    <div class="card" style="padding:24px; margin-bottom:22px;">
+        <h2>Homework &amp; Daily Diary</h2>
+        <p>Post subject homework and instructions for students and their linked parents.</p>
+        {% if subjects %}
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_homework">
+            <div class="col-md-6">
+                <label class="form-label" for="homework-title">Title</label>
+                <input class="form-control" id="homework-title" name="title" maxlength="180" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="homework-subject">Subject</label>
+                <select class="form-select" id="homework-subject" name="subject_id" required>
+                    <option value="">Choose a subject</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.pk }}">{{ subject.name }}  Sem {{ subject.semester }}  {{ subject.branch }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="homework-due-date">Due date</label>
+                <input class="form-control" id="homework-due-date" type="date" name="due_date" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="homework-file">Notes or attachment (up to 10 MB)</label>
+                <input class="form-control" id="homework-file" type="file" name="attachment" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="homework-instructions">Instructions</label>
+                <textarea class="form-control" id="homework-instructions" name="instructions" rows="4" maxlength="10000" required></textarea>
+            </div>
+            <div class="col-12"><button class="action-btn" type="submit">Publish homework</button></div>
+        </form>
+        {% else %}
+        <p>You need an active assigned subject before you can post homework.</p>
+        {% endif %}
+    </div>
+    <h2 class="mb-3">Recent homework</h2>
+    {% for item in teacher_homework %}
+    <article class="card" style="padding:20px; margin-bottom:14px;">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.subject.name }}  Semester {{ item.subject.semester }}  Due {{ item.due_date|date:"M j, Y" }}</p>
+        <p style="white-space:pre-wrap;">{{ item.instructions }}</p>
+        {% if item.attachment %}<a href="{% url 'private_file' 'homework' item.pk %}">Download attachment</a>{% endif %}
+    </article>
+    {% empty %}
+    <div class="card" style="padding:20px;">No homework has been posted.</div>
+    {% endfor %}
+</section>

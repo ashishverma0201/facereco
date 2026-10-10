@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,9 +127,10 @@
       }
     }
   </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
-<body>
+<body class="admin-dashboard">
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
   <div class="container">
@@ -177,6 +178,13 @@
           </a>
         </li>
 
+        <li class="nav-item ms-lg-3">
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-light btn-sm mt-1" type="submit">Log out</button>
+          </form>
+        </li>
+
       </ul>
 
     </div>
@@ -186,35 +194,45 @@
 
 <div class="container dashboard-section">
 
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+    <div class="alert alert-info" role="status">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <!-- Welcome Section -->
   <div class="welcome-section">
+
+    <span class="admin-welcome-kicker"><i></i> CAMPUS CONTROL CENTER</span>
 
     <h1>
       Welcome,
       {{ request.user.first_name|default:request.user.username }}!
     </h1>
 
-    <p>
-      You are logged in as Admin. Enjoy managing your dashboard!
-    </p>
+    <p>You are logged in as Admin. Manage people, schedules and campus updates from one place.</p>
 
   </div>
 
 
   <!-- Dashboard Cards -->
-  <div class="row g-4">
+  <div class="row g-4" id="dashboardCards">
 
     <!-- Start Camera -->
     <div class="col-md-4">
 
       <a href="{% url 'liveattendance' %}" style="text-decoration: none;">
 
-        <div class="card text-center start-camera">
+        <div class="card admin-action-card admin-card-camera start-camera">
 
           <div class="card-body">
 
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="4"/><path d="M9 3h6"/></svg></span>
+
             <h5 class="card-title">
-              🎥 Start Camera
+               Start Camera
             </h5>
 
             <p class="card-text">
@@ -229,18 +247,57 @@
 
     </div>
 
+    <!-- Announcements -->
+    <div class="col-md-4">
+      <a href="#announcements" onclick="openAnnouncements(); return false;" style="text-decoration:none;">
+        <div class="card admin-action-card admin-card-announcements timetable-card">
+          <div class="card-body">
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14v11H8l-3 3z"/><path d="M8 9h8M8 12h5"/></svg></span>
+            <h5 class="card-title">Announcements</h5>
+            <p class="card-text">Post updates for students or teachers and review recent announcements.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="#parentAccess" onclick="openParentAccess(); return false;" style="text-decoration:none;">
+        <div class="card admin-action-card admin-card-parents timetable-card">
+          <div class="card-body">
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M14 15c3.5-.5 5.5 1 6 5"/></svg></span>
+            <h5 class="card-title">Parent Access</h5>
+            <p class="card-text">Issue one-time student verification codes for parent accounts.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="#rooms" onclick="openRooms(); return false;" style="text-decoration:none;">
+        <div class="card admin-action-card admin-card-rooms subject-card">
+          <div class="card-body">
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12H4zM9 20v-6h6v6M8 10h.01M12 10h.01M16 10h.01"/></svg></span>
+            <h5 class="card-title">Classrooms &amp; Facilities</h5>
+            <p class="card-text">Add theory rooms, labs, library and sports locations for timetable planning.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+
 
     <!-- Overall Attendance -->
     <div class="col-md-4">
 
       <a href="{% url 'student_search' %}" style="text-decoration: none;">
 
-        <div class="card text-center">
+        <div class="card admin-action-card admin-card-attendance text-center">
 
           <div class="card-body">
 
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/><circle cx="19" cy="7" r="1"/></svg></span>
+
             <h5 class="card-title">
-              📊 Overall Attendance
+               Overall Attendance
             </h5>
 
             <p class="card-text">
@@ -257,21 +314,33 @@
 
 <!-- Manage Teachers --> <div class="col-md-4">
    <a href="{% url 'manage_teachers' %}" style="text-decoration: none;" >
-     <div class="card text-center teacher-card"> <div class="card-body"> 
-      <h5 class="card-title"> 👨‍🏫 Manage Teachers </h5> 
+     <div class="card admin-action-card admin-card-teachers text-center teacher-card"> <div class="card-body">
+      <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M16 11l2 2 4-5"/></svg></span>
+      <h5 class="card-title">Manage Teachers</h5>
       <p class="card-text"> Add, edit, and manage teacher accounts and assigned subjects. </p>
      </div> </div> </a> </div>
+    <div class="col-md-4">
+      <a href="{% url 'admin_teacher_leaves' %}" style="text-decoration:none;">
+        <div class="card admin-action-card admin-card-leaves text-center teacher-card"><div class="card-body">
+          <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3"/></svg></span>
+          <h5 class="card-title">Teacher Leave Requests</h5>
+          <p class="card-text">Review, approve, or reject teachers' leave applications.</p>
+        </div></div>
+      </a>
+    </div>
     <!-- Manage Users -->
     <div class="col-md-4">
 
       <a href="{% url 'manage_students' %}" style="text-decoration: none;">
 
-        <div class="card text-center">
+        <div class="card admin-action-card admin-card-students text-center">
 
           <div class="card-body">
 
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M14 15c3.5-.5 5.5 1 6 5"/></svg></span>
+
             <h5 class="card-title">
-              👥 Manage student
+               Manage student
             </h5>
 
             <p class="card-text">
@@ -292,12 +361,14 @@
 
       <a href="{% url 'subjects' %}" style="text-decoration: none;">
 
-        <div class="card text-center subject-card">
+        <div class="card admin-action-card admin-card-subjects text-center subject-card">
 
           <div class="card-body">
 
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22z"/><path d="M4 5.5V22M8 6h8M8 10h7"/></svg></span>
+
             <h5 class="card-title">
-              📚 Subjects
+               Subjects
             </h5>
 
             <p class="card-text">
@@ -318,12 +389,14 @@
 
       <a href="{% url 'timetable' %}" style="text-decoration: none;">
 
-        <div class="card text-center timetable-card">
+        <div class="card admin-action-card admin-card-timetable text-center timetable-card">
 
           <div class="card-body">
 
+            <span class="admin-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M14 14h3M8 17h3"/></svg></span>
+
             <h5 class="card-title">
-              🗓️ Timetable
+               Timetable
             </h5>
 
             <p class="card-text">
@@ -340,10 +413,210 @@
 
   </div>
 
+  <div id="roomManager" style="display:none;">
+    <button type="button" class="btn btn-secondary mt-4" onclick="closeRooms()">Back to dashboard</button>
+    <section class="card mt-3" id="rooms">
+      <div class="card-body p-4">
+        <h2 class="h3 mb-2">Classrooms &amp; facilities</h2>
+        <p>Active theory and lab rooms are used by automatic timetable generation. Library rooms are assigned to leave adjustments when available and are checked for room conflicts.</p>
+        <form method="post" class="row g-3">
+          {% csrf_token %}<input type="hidden" name="action" value="add_room">
+          <div class="col-md-4">
+            <label class="form-label" for="room-type">Class / facility type</label>
+            <select class="form-select" id="room-type" name="room_type" required>
+              <option value="">Choose type</option><option value="THEORY">Theory classroom</option><option value="LAB">Lab</option><option value="OTHER">Other facility</option>
+            </select>
+          </div>
+          <div class="col-md-4" id="other-purpose-wrap" hidden>
+            <label class="form-label" for="other-purpose">Facility use</label>
+            <select class="form-select" id="other-purpose" name="other_purpose">
+              <option value="">Choose use</option><option value="LIBRARY">Library</option><option value="SPORTS">Sports room / court</option><option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="col-md-4" id="other-label-wrap" hidden>
+            <label class="form-label" for="other-label">Facility name</label>
+            <input class="form-control" id="other-label" name="other_label" maxlength="50" placeholder="For example: Auditorium">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="room-number">Room / location number</label>
+            <input class="form-control" id="room-number" name="room_number" maxlength="50" placeholder="For example: 204 or LIB-1" required>
+          </div>
+          <div class="col-12"><button class="btn btn-primary" type="submit">Add room</button></div>
+        </form>
+      </div>
+    </section>
+    <section class="card mt-4">
+      <div class="card-body p-4">
+        <h2 class="h3 mb-3">Room inventory</h2>
+        <div class="table-responsive"><table class="table align-middle">
+          <thead><tr><th>Type</th><th>Room / number</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+          {% for room in room_inventory %}
+          <tr>
+            <td>{% if room.room_type == "OTHER" %}Other: {{ room.other_label|default:room.get_other_purpose_display }}{% else %}{{ room.get_room_type_display }}{% endif %}</td>
+            <td>{{ room.room_number }}</td><td>{% if room.is_active %}Active{% else %}Inactive{% endif %}</td>
+            <td><form method="post">{% csrf_token %}<input type="hidden" name="action" value="toggle_room"><input type="hidden" name="room_id" value="{{ room.pk }}"><button class="btn btn-sm {% if room.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" type="submit">{% if room.is_active %}Deactivate{% else %}Activate{% endif %}</button></form></td>
+          </tr>
+          {% empty %}<tr><td colspan="4">No rooms added yet. Add your rooms above to use them for timetable generation.</td></tr>{% endfor %}
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="parentAccessManager" style="display:none;">
+    <button type="button" class="btn btn-secondary mt-4" onclick="closeParentAccess()">Back to dashboard</button>
+    <section class="card mt-3" id="parentAccess">
+      <div class="card-body p-4">
+        <h2 class="h3 mb-2">Issue a parent verification code</h2>
+        <p>The code is single-use, expires in three days, and must be given directly to the student's parent or guardian. Roll number alone cannot link an account.</p>
+        <p class="small">Review parent links, teacher messages and homework records in the <a href="/admin/facereco/">Django administration area</a>. Manage school holidays there as well.</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="issue_parent_code">
+          <div class="mb-3">
+            <label class="form-label" for="parent-code-student">Student</label>
+            <select class="form-select" id="parent-code-student" name="student_id" required>
+              <option value="">Choose a student</option>
+              {% for student in parent_code_students %}
+              <option value="{{ student.pk }}">{{ student.student_name }}  {{ student.roll_no }}  {{ student.branch }}  Semester {{ student.semester }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit">Generate one-time code</button>
+        </form>
+      </div>
+    </section>
+    <section class="card mt-4">
+      <div class="card-body p-4">
+        <h2 class="h3 mb-3">Recent code issues</h2>
+        {% for code in parent_verification_codes %}
+        <article class="py-3 border-bottom">
+          <strong>{{ code.student.student_name }}  {{ code.student.roll_no }}</strong>
+          <div class="text-muted">Issued {{ code.issued_at|date:"M j, Y, g:i a" }}  Expires {{ code.expires_at|date:"M j, Y, g:i a" }}</div>
+          <div>{% if code.used_at %}Used{% elif code.is_active %}Active{% else %}Inactive{% endif %}</div>
+        </article>
+        {% empty %}<p>No parent codes issued yet.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <div id="announcementManager" style="display:none;">
+  <button type="button" class="btn btn-secondary mt-4" onclick="closeAnnouncements()">Back to dashboard</button>
+  <section class="card mt-3" id="announcements">
+    <div class="card-body p-4">
+      <h2 class="h3 mb-3">Create an announcement</h2>
+      <p>Choose whether this announcement should appear in student panels or teacher panels.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="announcement-title">Title</label>
+          <input class="form-control" id="announcement-title" name="title" maxlength="150" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="announcement-audience">Announcement for</label>
+          <select class="form-select" id="announcement-audience" name="audience" required>
+            <option value="STUDENTS">Students</option>
+            <option value="TEACHERS">Teachers</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="announcement-message">Message</label>
+          <textarea class="form-control" id="announcement-message" name="message" rows="4" required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Post announcement</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="card mt-4">
+    <div class="card-body p-4">
+      <h2 class="h3 mb-3">Your recent announcements</h2>
+      {% for announcement in announcements %}
+      <article class="py-3 border-bottom">
+        <strong>{{ announcement.title }}</strong>
+        <div class="text-muted">For {{ announcement.get_audience_display }}  {{ announcement.created_at|date:"M j, Y, g:i a" }}</div>
+        <p class="mb-0 mt-2" style="white-space:pre-wrap;">{{ announcement.message }}</p>
+      </article>
+      {% empty %}<p class="mb-0">No announcements posted yet.</p>{% endfor %}
+    </div>
+  </section>
+  </div>
+
 </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function openAnnouncements() {
+    document.getElementById('roomManager').style.display = 'none';
+    document.getElementById('parentAccessManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = 'none';
+    document.getElementById('dashboardCards').style.display = 'none';
+    document.getElementById('announcementManager').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function closeAnnouncements() {
+    document.getElementById('announcementManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = '';
+    document.getElementById('dashboardCards').style.display = '';
+    window.scrollTo(0, 0);
+  }
+
+  function openParentAccess() {
+    document.getElementById('roomManager').style.display = 'none';
+    document.getElementById('announcementManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = 'none';
+    document.getElementById('dashboardCards').style.display = 'none';
+    document.getElementById('parentAccessManager').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function closeParentAccess() {
+    document.getElementById('parentAccessManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = '';
+    document.getElementById('dashboardCards').style.display = '';
+    window.scrollTo(0, 0);
+  }
+
+  function openRooms() {
+    document.getElementById('announcementManager').style.display = 'none';
+    document.getElementById('parentAccessManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = 'none';
+    document.getElementById('dashboardCards').style.display = 'none';
+    document.getElementById('roomManager').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function closeRooms() {
+    document.getElementById('roomManager').style.display = 'none';
+    document.querySelector('.welcome-section').style.display = '';
+    document.getElementById('dashboardCards').style.display = '';
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('room-type').addEventListener('change', function() {
+    const otherWrap = document.getElementById('other-purpose-wrap');
+    const purpose = document.getElementById('other-purpose');
+    const isOther = this.value === 'OTHER';
+    otherWrap.hidden = !isOther;
+    purpose.required = isOther;
+    if (!isOther) {
+      document.getElementById('other-label-wrap').hidden = true;
+      document.getElementById('other-label').required = false;
+    }
+  });
+  document.getElementById('other-purpose').addEventListener('change', function() {
+    const isCustomFacility = this.value === 'OTHER';
+    document.getElementById('other-label-wrap').hidden = !isCustomFacility;
+    document.getElementById('other-label').required = isCustomFacility;
+  });
+
+  {% if show_announcements %}openAnnouncements();{% endif %}
+  {% if show_parent_access %}openParentAccess();{% endif %}
+  {% if show_rooms %}openRooms();{% endif %}
+</script>
 
 </body>
 </html>

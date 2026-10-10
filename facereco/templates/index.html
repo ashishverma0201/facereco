@@ -1,302 +1,85 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Face Recognition Attendance System</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  {% load static %}
-  <style>
-    /* Body & Typography */
-    body {
-      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #1a202c;
-      line-height: 1.6;
-    }
-
-    /* Navbar */
-    .navbar {
-      background-color: #0a2540;
-      box-shadow: 0 4px 6px rgba(10, 37, 64, 0.3);
-    }
-    .navbar-brand h1 {
-      font-weight: 900;
-      font-size: 1.8rem;
-      color: #ffd43b;
-      letter-spacing: 1px;
-    }
-    .navbar-nav .nav-link {
-      color: #f0f0f0 !important;
-      font-weight: 600;
-      padding: 10px 15px;
-      transition: all 0.3s ease;
-      border-radius: 6px;
-      position: relative;
-    }
-    .navbar-nav .nav-link::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      left: 0;
-      bottom: 0;
-      background: #ffd43b;
-      transition: width 0.3s ease;
-      border-radius: 2px;
-    }
-    .navbar-nav .nav-link:hover::after {
-      width: 100%;
-    }
-    .navbar-nav .nav-link:hover {
-      color: #0a2540 !important;
-      background-color: #ffd43b;
-      box-shadow: 0 4px 10px rgba(255, 212, 59, 0.5);
-    }
-
-    /* Scrolling Text */
-    .scrolling-container {
-      overflow: hidden;
-      white-space: nowrap;
-      background-color: #dbeafe;
-      padding: 12px 0;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    .scrolling-text {
-      display: inline-block;
-      padding-left: 100%;
-      animation: scroll-left 18s linear infinite;
-      font-size: 1.3rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #ffd43b, #0a2540, #ffd43b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      user-select: none;
-    }
-    @keyframes scroll-left {
-      0% { transform: translateX(0%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Header */
-    header {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(15px);
-      padding: 3rem 1rem;
-      margin-bottom: 40px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
-    header h1 {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #0a2540;
-      margin-bottom: 0.3rem;
-      letter-spacing: 2px;
-    }
-    header h2 {
-      font-weight: 600;
-      color: #344054;
-      margin-bottom: 1rem;
-    }
-    header p.lead {
-      font-size: 1.25rem;
-      color: #475569;
-      font-weight: 500;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    /* Carousel */
-    .carousel-inner {
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(10, 37, 64, 0.2);
-    }
-    .carousel-item img {
-      max-height: 420px;
-      object-fit: cover;
-      filter: brightness(0.9);
-      transition: transform 0.5s ease, filter 0.5s ease;
-    }
-    .carousel-item:hover img {
-      transform: scale(1.05);
-      filter: brightness(1);
-    }
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-      filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.3));
-    }
-
-    /* Content Cards */
-    .content-card {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 30px 35px;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(10, 37, 64, 0.1);
-      transition: all 0.4s ease;
-    }
-    .content-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 12px 40px rgba(255, 212, 59, 0.4);
-    }
-    h3 {
-      position: relative;
-      color: #0a2540;
-      font-weight: 800;
-      margin-bottom: 20px;
-      letter-spacing: 1.2px;
-    }
-    h3::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #ffd43b, #0a2540);
-      left: 0;
-      bottom: -6px;
-      border-radius: 4px;
-      transition: width 0.4s ease;
-    }
-    h3:hover::after { width: 60px; }
-    ul li {
-      margin-bottom: 10px;
-      font-weight: 600;
-      color: #344054;
-    }
-    p { font-size: 1.1rem; color: #475569; font-weight: 500; }
-
-    /* Gradient Buttons */
-    .btn-gradient {
-      background: linear-gradient(45deg, #ffd43b, #0a2540);
-      color: #fff;
-      font-weight: 700;
-      border-radius: 50px;
-      padding: 10px 25px;
-      transition: all 0.3s ease;
-      border: none;
-    }
-    .btn-gradient:hover {
-      background: linear-gradient(45deg, #0a2540, #ffd43b);
-      color: #0a2540;
-      box-shadow: 0 8px 20px rgba(255, 212, 59, 0.5);
-      transform: translateY(-3px);
-    }
-
-    /* Footer */
-    footer {
-      background-color: #0a2540;
-      color: #ffd43b;
-      padding: 25px 0;
-      text-align: center;
-      font-weight: 600;
-      letter-spacing: 1px;
-      box-shadow: 0 -4px 8px rgba(10, 37, 64, 0.3);
-      transition: all 0.3s ease;
-      margin-top: 60px;
-    }
-    footer:hover {
-      box-shadow: 0 -4px 20px rgba(255, 212, 59, 0.6);
-      transform: translateY(-3px);
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111b3e">
+  <title>UIT Shimla | Smart Attendance Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
-<body>
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#"><h1><b>Attendance System</b></h1></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">User Panel</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'adminlogin'%}">Admin Panel</a></li>
-          
-          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-        </ul>
-      </div>
+<body class="landing-page">
+  <nav class="landing-nav">
+    <a class="landing-brand" href="#home" aria-label="UIT Shimla home">
+      <span class="landing-brand-mark" aria-hidden="true">U</span>
+      <span><strong>UIT SHIMLA</strong><small>SMART CAMPUS PORTAL</small></span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="#portals">Portals</a>
+      <a href="#features">Features</a>
+      <a class="landing-nav-login" href="{% url 'login' %}">Sign in <span aria-hidden="true">-&gt;</span></a>
     </div>
   </nav>
 
-  <!-- Scrolling Text -->
-  <div class="scrolling-container">
-    <div class="scrolling-text">
-      📢 Welcome to the Face Recognition Attendance System – Accurate, Real-time, and AI-Powered!
-    </div>
-  </div>
-
-  <!-- Header -->
-  <header>
-    <h1>UNIVERSITY INSTITUTE OF TECHNOLOGY, SHIMLA</h1>
-    <h2>Welcome to the Face Recognition Attendance System</h2>
-    <p class="lead">Secure, accurate, and automated attendance tracking using cutting-edge AI and facial recognition technology.</p>
-  </header>
-
-  <!-- Carousel -->
-  <div id="carouselExample" class="carousel slide container my-5" data-bs-ride="carousel">
-    <div class="carousel-inner rounded shadow">
-      <div class="carousel-item active">
-        <img src="{% static 'face1.webp' %}" class="d-block w-100" alt="Slide 1" />
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'face2.webp' %}" class="d-block w-100" alt="Slide 2" />
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'face3.jpg' %}" class="d-block w-100" alt="Slide 3" />
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-      <span class="carousel-control-next-icon"></span>
-    </button>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container my-5">
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="content-card">
-          <h3>Why Choose FRAS?</h3>
-          <ul>
-            <li>Face-based secure attendance</li>
-            <li>No manual intervention</li>
-            <li>Real-time recognition</li>
-            <li>Detailed attendance reports</li>
-          </ul>
-          <a href="{% url 'register' %}" class="btn btn-gradient mt-3">Get Started</a>
+  <main id="home">
+    <section class="landing-hero">
+      <div class="landing-hero-copy">
+        <div class="landing-eyebrow"><span></span> FACE ATTENDANCE | CONNECTED CAMPUS</div>
+        <h1>Every class.<br>Every moment.<br><em>In sync.</em></h1>
+        <p>One simple place for attendance, class updates, timetables and the people who make campus work.</p>
+        <div class="landing-actions">
+          <a class="landing-button landing-button-primary" href="#portals">Explore your portal <span aria-hidden="true">-&gt;</span></a>
+          <a class="landing-button landing-button-quiet" href="{% url 'register' %}">Create student account</a>
         </div>
+        <div class="landing-proof"><span class="landing-proof-icon">OK</span> Fast face-based attendance <i></i> Clear updates for everyone</div>
       </div>
-      <div class="col-md-6">
-        <div class="content-card">
-          <h3>Features</h3>
-          <ul>
-            <li>AI-powered facial recognition</li>
-            <li>Instant alerts & notifications</li>
-            <li>Cross-device support</li>
-            <li>Secure data storage</li>
-          </ul>
-          <a href="{% url 'login' %}" class="btn btn-gradient mt-3">Login Now</a>
+
+      <div class="landing-art" aria-label="Illustration of face attendance being recorded in a campus dashboard">
+        <div class="landing-orbit landing-orbit-one"></div>
+        <div class="landing-orbit landing-orbit-two"></div>
+        <div class="landing-float landing-float-top"><span class="landing-float-dot"></span><span><b>Identity verified</b><small>Secure face match</small></span><span class="landing-check">OK</span></div>
+        <div class="landing-device">
+          <div class="landing-device-head"><span class="landing-device-brand"><i></i> CAMPUS / LIVE</span><span class="landing-device-menu">LIVE</span></div>
+          <div class="landing-camera-scene">
+            <div class="landing-scan-line"></div>
+            <div class="landing-face">
+              <div class="landing-face-hair"></div><div class="landing-face-shape"></div>
+              <i class="landing-eye landing-eye-left"></i><i class="landing-eye landing-eye-right"></i>
+              <i class="landing-nose"></i><i class="landing-mouth"></i>
+            </div>
+            <span class="landing-corner landing-corner-tl"></span><span class="landing-corner landing-corner-tr"></span>
+            <span class="landing-corner landing-corner-bl"></span><span class="landing-corner landing-corner-br"></span>
+            <span class="landing-camera-caption"><i></i> CAMERA READY</span>
+          </div>
+          <div class="landing-device-status"><span class="landing-status-avatar">A</span><span><b>Attendance marked</b><small>Student  Present</small></span><strong>JUST NOW</strong></div>
+          <div class="landing-device-footer"><span>MONDAY, 09:02 AM</span><span>UIT SHIMLA</span></div>
         </div>
+        <div class="landing-float landing-float-bottom"><span class="landing-mini-bars"><i></i><i></i><i></i><i></i><i></i></span><span><b>One connected campus</b><small>Students  Teachers  Parents</small></span></div>
+        <div class="landing-art-star landing-star-one"></div><div class="landing-art-star landing-star-two"></div>
       </div>
-    </div>
-  </div>
+      <a class="landing-scroll" href="#portals"><span></span> SCROLL TO EXPLORE</a>
+    </section>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 Face Recognition Attendance System | Developed by UIT Shimla
-  </footer>
+    <section class="landing-portals" id="portals">
+      <div class="landing-section-heading"><div><div class="landing-eyebrow landing-eyebrow-dark"><span></span> YOUR CAMPUS | YOUR VIEW</div><h2>Choose your <em>space.</em></h2></div><p>Sign in to the portal made for you.<br>Your campus updates are waiting.</p></div>
+      <div class="portal-grid">
+        <a class="portal-card portal-card-student" href="{% url 'login' %}"><span class="portal-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.5-4 2.8-6 7-6s6.5 2 7 6"/></svg></span><span class="portal-card-label">FOR LEARNERS</span><strong>Student portal</strong><span class="portal-card-copy">Attendance, timetable, tests and campus notices.</span><span class="portal-card-arrow">-&gt;</span></a>
+        <a class="portal-card portal-card-teacher" href="{% url 'login' %}"><span class="portal-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H4zM8 20h8M12 16v4M7 9h10M7 12h6"/></svg></span><span class="portal-card-label">FOR EDUCATORS</span><strong>Teacher portal</strong><span class="portal-card-copy">Manage classes, attendance and student updates.</span><span class="portal-card-arrow">-&gt;</span></a>
+        <a class="portal-card portal-card-parent" href="{% url 'parent_login' %}"><span class="portal-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-4 2.4-6 6-6s5.6 2 6 6M14 15c3.7-.8 6 .9 6.5 4"/></svg></span><span class="portal-card-label">FOR FAMILIES</span><strong>Parent portal</strong><span class="portal-card-copy">Stay close to your child's learning and progress.</span><span class="portal-card-arrow">-&gt;</span></a>
+        <a class="portal-card portal-card-admin" href="{% url 'adminlogin' %}"><span class="portal-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11H4zM9 20v-6h6v6M8 10h.01M12 10h.01M16 10h.01"/></svg></span><span class="portal-card-label">CAMPUS OPERATIONS</span><strong>Admin portal</strong><span class="portal-card-copy">Keep campus schedules and information in sync.</span><span class="portal-card-arrow">-&gt;</span></a>
+      </div>
+    </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <section class="landing-feature-band" id="features">
+      <div class="landing-feature-intro"><div class="landing-eyebrow"><span></span> BUILT FOR THE EVERYDAY</div><h2>A smoother<br>campus rhythm.</h2><p>Useful information, right when you need it. Fewer missed updates, more time for what matters.</p></div>
+      <div class="landing-feature-list">
+        <article><span>01</span><div><h3>Attendance, made simple</h3><p>Face recognition helps record class attendance quickly and clearly.</p></div><b></b></article>
+        <article><span>02</span><div><h3>Updates that find you</h3><p>Announcements, test details and timetable changes in one place.</p></div><b></b></article>
+        <article><span>03</span><div><h3>Everyone in sync</h3><p>Students, teachers and families stay connected to campus life.</p></div><b></b></article>
+      </div>
+    </section>
+  </main>
+  <footer class="landing-footer"><a class="landing-brand" href="#home"><span class="landing-brand-mark">U</span><span><strong>UIT SHIMLA</strong><small>SMART CAMPUS PORTAL</small></span></a><span>University Institute of Technology, Shimla</span><span> 2026  Campus, connected.</span></footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

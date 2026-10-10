@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teacher Leave Requests | FaceAttend</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/portal-theme.css">
+</head>
+<body class="bg-light">
+<main class="container py-4" style="max-width: 1100px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h1 class="h3 mb-1">Teacher Leave Requests</h1><p class="text-secondary mb-0">Review and decide on teacher leave applications.</p></div>
+        <a class="btn btn-outline-primary" href="{% url 'adminpanel' %}">Back to admin panel</a>
+    </div>
+    {% if messages %}{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}{% endif %}
+    {% for application in applications %}
+    <article class="card shadow-sm border-0 mb-3"><div class="card-body p-4">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div><h2 class="h5 mb-1">{{ application.teacher.user.get_full_name|default:application.teacher.user.username }}</h2><div class="text-secondary">Employee ID: {{ application.teacher.employee_id }}  {{ application.teacher.branch }}</div></div>
+            <span class="badge {% if application.status == 'APPROVED' %}text-bg-success{% elif application.status == 'REJECTED' %}text-bg-danger{% else %}text-bg-warning{% endif %}">{{ application.get_status_display }}</span>
+        </div>
+        <p class="mt-3 mb-2"><strong>Dates:</strong> {{ application.start_date|date:"M j, Y" }}{% if application.end_date != application.start_date %}  {{ application.end_date|date:"M j, Y" }}{% endif %}</p>
+        <p class="mb-3"><strong>Reason:</strong><br>{{ application.reason|linebreaksbr }}</p>
+        {% if application.status == "PENDING" %}
+        <form method="post" class="border-top pt-3">
+            {% csrf_token %}<input type="hidden" name="application_id" value="{{ application.pk }}">
+            <label class="form-label" for="admin-note-{{ application.pk }}">Note for teacher (optional)</label>
+            <textarea class="form-control mb-3" id="admin-note-{{ application.pk }}" name="admin_note" rows="2" maxlength="2000"></textarea>
+            <button class="btn btn-success" type="submit" name="decision" value="APPROVED">Grant leave</button>
+            <button class="btn btn-outline-danger ms-2" type="submit" name="decision" value="REJECTED">Reject</button>
+        </form>
+        {% elif application.admin_note %}<p class="small text-secondary mb-0">Admin note: {{ application.admin_note }}</p>{% endif %}
+    </div></article>
+    {% empty %}<div class="card border-0 shadow-sm"><div class="card-body text-secondary">No teacher leave requests yet.</div></div>{% endfor %}
+
+    <h2 class="h4 mt-5 mb-3">Class adjustments</h2>
+    <p class="text-secondary">Approved teacher leave is assigned to a free teacher for the same subject when possible. If no one is free, the class defaults to Library. You can change any adjustment here.</p>
+    {% for adjustment in adjustments %}
+    <article class="card shadow-sm border-0 mb-3"><div class="card-body p-4">
+        <h3 class="h5">{{ adjustment.subject.name }}  {{ adjustment.class_date|date:"D, M j, Y" }}</h3>
+        <p class="text-secondary mb-3">{{ adjustment.start_time|time:"H:i" }} - {{ adjustment.end_time|time:"H:i" }} | {% if adjustment.adjustment_type == "LIBRARY" %}Library{% if adjustment.room %}, Room {{ adjustment.room }}{% else %}, no library room assigned{% endif %}{% else %}Room {{ adjustment.room|default:"-" }}{% endif %} | Leave for {{ adjustment.leave_application.teacher.user.get_full_name|default:adjustment.leave_application.teacher.user.username }}</p>
+        <form method="post" class="row g-3">
+            {% csrf_token %}<input type="hidden" name="action" value="update_adjustment"><input type="hidden" name="adjustment_id" value="{{ adjustment.pk }}">
+            <div class="col-md-4"><label class="form-label" for="adjustment-type-{{ adjustment.pk }}">Class plan</label><select class="form-select adjustment-type" id="adjustment-type-{{ adjustment.pk }}" name="adjustment_type" data-adjustment="{{ adjustment.pk }}"><option value="SUBSTITUTE" {% if adjustment.adjustment_type == "SUBSTITUTE" %}selected{% endif %}>Substitute teacher</option><option value="LIBRARY" {% if adjustment.adjustment_type == "LIBRARY" %}selected{% endif %}>Library</option><option value="CUSTOM" {% if adjustment.adjustment_type == "CUSTOM" %}selected{% endif %}>Other activity</option></select></div>
+            <div class="col-md-4 substitute-field" data-adjustment="{{ adjustment.pk }}"><label class="form-label" for="substitute-{{ adjustment.pk }}">Teacher assigned to {{ adjustment.subject.name }}</label><select class="form-select" id="substitute-{{ adjustment.pk }}" name="substitute_teacher"><option value="">Choose teacher</option>{% for candidate in available_teachers %}<option value="{{ candidate.pk }}" {% if adjustment.substitute_teacher_id == candidate.pk %}selected{% endif %}>{{ candidate.user.get_full_name|default:candidate.user.username }}  {{ candidate.employee_id }}</option>{% endfor %}</select></div>
+            <div class="col-md-4 custom-field" data-adjustment="{{ adjustment.pk }}"><label class="form-label" for="custom-activity-{{ adjustment.pk }}">Activity name</label><input class="form-control" id="custom-activity-{{ adjustment.pk }}" name="custom_activity" maxlength="150" value="{{ adjustment.custom_activity }}" placeholder="For example: Library"></div>
+            <div class="col-md-8"><label class="form-label" for="adjustment-note-{{ adjustment.pk }}">Admin note</label><input class="form-control" id="adjustment-note-{{ adjustment.pk }}" name="admin_note" value="{{ adjustment.admin_note }}" maxlength="2000"></div>
+            <div class="col-12"><button class="btn btn-primary" type="submit">Save adjustment</button></div>
+        </form>
+    </div></article>
+    {% empty %}<div class="card border-0 shadow-sm"><div class="card-body text-secondary">No class adjustments have been created.</div></div>{% endfor %}
+</main>
+<script>
+document.querySelectorAll(".adjustment-type").forEach(typeSelect => {
+    function updateFields() {
+        const id = typeSelect.dataset.adjustment;
+        const isSubstitute = typeSelect.value === "SUBSTITUTE";
+        const isCustom = typeSelect.value === "CUSTOM";
+        document.querySelector(`.substitute-field[data-adjustment="${id}"]`).hidden = !isSubstitute;
+        document.querySelector(`.custom-field[data-adjustment="${id}"]`).hidden = !isCustom;
+    }
+    typeSelect.addEventListener("change", updateFields);
+    updateFields();
+});
+</script>
+</body>
+</html>

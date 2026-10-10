@@ -1,0 +1,218 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Parent Dashboard | School Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root{--ink:#172554;--muted:#64748b;--line:#e2e8f0}
+        *{box-sizing:border-box}
+        body{margin:0;background:#f4f7fc;color:var(--ink);font-family:Inter,"Segoe UI",sans-serif}
+        .topbar{padding:20px clamp(18px,5vw,60px);background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px}
+        .brand{font-weight:900;color:#1d4ed8;letter-spacing:.07em}
+        .topbar a{color:#475569;text-decoration:none}
+        .wrap{max-width:1240px;margin:auto;padding:32px clamp(16px,4vw,40px) 60px}
+        .hero{display:flex;align-items:center;justify-content:space-between;gap:22px;background:linear-gradient(120deg,#1d4ed8,#4f46e5);border-radius:24px;color:#fff;padding:clamp(24px,5vw,42px);box-shadow:0 18px 45px #1d4ed833}
+        .hero h1{font-weight:850;letter-spacing:-.04em}
+        .avatar{width:76px;height:76px;border:3px solid #ffffff80;border-radius:24px;object-fit:cover}
+        .avatar-placeholder{display:grid;place-items:center;background:#ffffff20;font-size:26px;font-weight:800}
+        .child-switch{max-width:260px;background:#ffffff20;color:#fff;border-color:#ffffff66}
+        .child-switch option{color:#111827}
+        .metric-grid,.card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:24px 0}
+        .metric,.nav-card,.panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 30px #0f172a0b}
+        .metric{padding:20px}.metric span{display:block;color:var(--muted);font-size:.88rem}.metric strong{display:block;font-size:1.65rem;margin-top:7px}
+        .card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .nav-card{border:0;text-align:left;padding:22px;min-height:156px;cursor:pointer;color:#fff;transition:transform .2s,box-shadow .2s}
+        .nav-card:hover{transform:translateY(-4px);box-shadow:0 18px 34px #0f172a22}
+        .nav-card:nth-child(1){background:linear-gradient(140deg,#2563eb,#1d4ed8)}
+        .nav-card:nth-child(2){background:linear-gradient(140deg,#0891b2,#0e7490)}
+        .nav-card:nth-child(3){background:linear-gradient(140deg,#7c3aed,#6d28d9)}
+        .nav-card:nth-child(4){background:linear-gradient(140deg,#059669,#047857)}
+        .nav-card:nth-child(5){background:linear-gradient(140deg,#ea580c,#c2410c)}
+        .nav-card:nth-child(6){background:linear-gradient(140deg,#db2777,#be185d)}
+        .nav-card:nth-child(7){background:linear-gradient(140deg,#475569,#334155)}
+        .nav-card .icon{font-size:1.5rem}.nav-card strong{display:block;font-size:1.05rem;margin:12px 0 5px}.nav-card small{color:#ffffffd9}
+        .panel{padding:clamp(20px,4vw,32px);margin-top:18px}
+        .panel h2{font-weight:800;margin:0 0 18px}
+        .record{border:1px solid var(--line);border-radius:15px;padding:16px;margin:12px 0;background:#fff}
+        .record p:last-child{margin-bottom:0}
+        .pill{display:inline-block;border-radius:999px;padding:4px 10px;background:#eff6ff;color:#1d4ed8;font-size:.83rem;font-weight:700}
+        .status-present{color:#047857}.status-absent{color:#b91c1c}.status-pending{color:#b45309}
+        .section{display:none}.section.active{display:block;animation:fadein .25s ease}
+        .table-wrap{overflow:auto}.parent-table{width:100%;border-collapse:collapse;min-width:600px}.parent-table th,.parent-table td{padding:12px;border-bottom:1px solid var(--line);text-align:left}
+        .parent-table th{color:#64748b;font-size:.83rem;text-transform:uppercase;letter-spacing:.05em}
+        textarea,select.form-select{border-radius:12px}
+        @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:900px){.metric-grid,.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:560px){.topbar{align-items:flex-start}.hero{align-items:flex-start}.metric-grid,.card-grid{grid-template-columns:1fr 1fr}.nav-card{padding:16px;min-height:145px}.avatar{width:58px;height:58px}}
+    </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="{% url 'parent_dashboard' %}">SCHOOL PORTAL</a>
+    <div class="d-flex gap-3 align-items-center"><span>{{ request.user.get_full_name|default:request.user.email }}</span><form id="parentLogoutForm" method="post" action="{% url 'parent_logout' %}" class="m-0">{% csrf_token %}<button type="submit" class="btn btn-link p-0 text-decoration-none">Log out</button></form></div>
+</header>
+<main class="wrap">
+    {% if messages %}{% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}{% endif %}
+    <section class="hero">
+        <div>
+            <p class="mb-2 text-white-50">PARENT DASHBOARD</p>
+            <h1 class="h2 mb-2">Hello, {{ request.user.first_name|default:request.user.email }}</h1>
+            <p class="mb-3">Updates for {{ student.student_name }}  {{ student_link.get_relationship_display }}</p>
+            {% if student_links|length > 1 %}
+            <form method="get"><select class="form-select child-switch" name="child" onchange="this.form.submit()">{% for link in student_links %}<option value="{{ link.pk }}"{% if link.pk == student_link.pk %} selected{% endif %}>{{ link.student.student_name }}  {{ link.student.roll_no }}</option>{% endfor %}</select></form>
+            {% else %}<div>{{ student.branch }}  Semester {{ student.semester }}  Roll {{ student.roll_no }}</div>{% endif %}
+        </div>
+        {% if student.face_image %}<img class="avatar" src="{% url 'private_file' 'student-face' student.pk %}" alt="{{ student.student_name }}">{% else %}<div class="avatar avatar-placeholder">{{ student.student_name|first|upper }}</div>{% endif %}
+    </section>
+
+    <section class="metric-grid section active" id="home-metrics">
+        <div class="metric"><span>Today's attendance</span><strong>{{ today_status }}</strong></div>
+        <div class="metric"><span>Attendance percentage</span><strong>{{ overall_percentage }}%</strong></div>
+        <div class="metric"><span>Pending homework</span><strong>{{ pending_homework_count }}</strong></div>
+        <div class="metric"><span>Upcoming tests</span><strong>{{ upcoming_tests|length }}</strong></div>
+    </section>
+
+    <nav class="card-grid section active" id="parent-cards" aria-label="Parent dashboard">
+        <button class="nav-card" onclick="showParentSection('profile')"><span class="icon">P</span><strong>Child Profile</strong><small>Student and class details</small></button>
+        <button class="nav-card" onclick="showParentSection('attendance')"><span class="icon">A</span><strong>Attendance</strong><small>Daily status and attendance summary</small></button>
+        <button class="nav-card" onclick="showParentSection('results')"><span class="icon">R</span><strong>Marks &amp; Tests</strong><small>Tests, results and marks</small></button>
+        <button class="nav-card" onclick="showParentSection('homework')"><span class="icon">H</span><strong>Homework &amp; Diary</strong><small>Assignments, due dates and files</small></button>
+        <button class="nav-card" onclick="showParentSection('timetable')"><span class="icon">T</span><strong>Timetable</strong><small>Regular schedule and leave changes</small></button>
+        <button class="nav-card" onclick="showParentSection('notifications')"><span class="icon">N</span><strong>Notifications</strong><small>Announcements and school updates</small></button>
+        <button class="nav-card" onclick="showParentSection('messages')"><span class="icon">M</span><strong>Teacher Messages</strong><small>Contact an assigned teacher</small></button>
+    </nav>
+
+    <section class="panel section" id="profile">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Child Profile</h2>
+        <div class="record"><h3 class="h5">{{ student.student_name }}</h3><p>Roll number: {{ student.roll_no }}</p><p>Branch: {{ student.branch }}</p><p>Class / semester: {{ student.semester }}</p><p>Parent relationship: {{ student_link.get_relationship_display }}</p></div>
+    </section>
+
+    <section class="panel section" id="attendance">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Attendance</h2>
+        {% if overall_percentage < 75 %}<div class="alert alert-warning">Attendance is below 75%. Please check the recent class record.</div>{% endif %}
+        <div class="metric-grid"><div class="metric"><span>Attendance</span><strong>{{ overall_percentage }}%</strong></div><div class="metric"><span>Classes attended</span><strong>{{ total_attended }} / {{ total_classes }}</strong></div></div>
+        <h3 class="h5 mt-4">This month's class records</h3>
+        <div class="table-wrap"><table class="parent-table"><thead><tr><th>Date</th><th>Subject</th><th>Time</th><th>Status</th></tr></thead><tbody>
+        {% for item in attendance_calendar %}<tr><td>{{ item.date|date:"M j, Y" }}</td><td>{{ item.subject }}</td><td>{{ item.time|time:"g:i A" }}</td><td class="{% if item.status == 'Present' %}status-present{% elif item.status == 'Absent' %}status-absent{% else %}status-pending{% endif %}">{{ item.status }}</td></tr>
+        {% empty %}<tr><td colspan="4">No published classes for this month.</td></tr>{% endfor %}
+        </tbody></table></div>
+        <h3 class="h5 mt-4">Subject summary</h3>
+        {% for row in attendance_summary %}<article class="record"><strong>{{ row.subject_name|default:row.name }}</strong><span class="float-end">{{ row.percentage }}%</span><p class="text-secondary mb-0">{{ row.attended }} of {{ row.total }} classes attended</p></article>{% empty %}<p>No attendance summary is available yet.</p>{% endfor %}
+        <p class="small text-secondary">The attendance system records Present entries. Past scheduled sessions without a matching attendance entry are shown as Absent; the system does not currently record Late separately.</p>
+    </section>
+
+    <section class="panel section" id="results">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Marks &amp; Tests</h2>
+        <a class="btn btn-outline-primary mb-3" href="{% url 'parent_report_card' student_link.pk %}">Download test report card</a>
+        {% for item in class_tests %}<article class="record"><h3 class="h5">{{ item.title }}  {{ item.subject.name }}</h3><p class="text-secondary">Test date {{ item.test_date|date:"M j, Y" }}  Maximum marks {{ item.max_marks }}</p><p><strong>Units / topics:</strong><br>{{ item.units_topics|linebreaksbr }}</p>{% if item.student_result %}<div class="alert alert-success mb-0">Marks: {{ item.student_result.marks_obtained }} / {{ item.max_marks }}</div>{% else %}<div class="alert alert-light mb-0">Marks not published yet.</div>{% endif %}</article>{% empty %}<p>No tests have been posted for this class.</p>{% endfor %}
+    </section>
+
+    <section class="panel section" id="homework">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Homework &amp; Daily Diary</h2>
+        {% for item in homework %}<article class="record"><div class="d-flex justify-content-between gap-3 flex-wrap"><h3 class="h5">{{ item.title }}</h3><span class="pill">Due {{ item.due_date|date:"M j, Y" }}</span></div><p class="text-secondary">{{ item.subject.name }}{% if item.teacher %}  {{ item.teacher.user.get_full_name|default:item.teacher.user.username }}{% endif %}</p><p style="white-space:pre-wrap;">{{ item.instructions }}</p>{% if item.attachment %}<a href="{% url 'private_file' 'homework' item.pk %}">Download attached notes / file</a>{% endif %}</article>{% empty %}<p>No homework has been posted.</p>{% endfor %}
+    </section>
+
+    <section class="panel section" id="timetable">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Weekly Timetable</h2>
+        {% for item in timetable %}<article class="record"><span class="pill">{{ item.get_day_display }}</span><h3 class="h5 mt-2">{{ item.subject.name }}</h3><p>{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }} | {{ item.get_session_type_display }}</p><p class="text-secondary mb-0">Teacher: {{ item.teacher.user.get_full_name|default:item.teacher.user.username }}{% if item.room %} | Room {{ item.room }}{% endif %}</p></article>{% empty %}<p>No published timetable is available.</p>{% endfor %}
+        <h2 class="mt-4">Special timetable changes</h2>
+        {% for item in adjustments %}<article class="record"><h3 class="h5">{{ item.subject.name }} | {{ item.class_date|date:"D, M j, Y" }}</h3><p>{{ item.start_time|time:"g:i A" }} - {{ item.end_time|time:"g:i A" }}</p>{% if item.adjustment_type == "SUBSTITUTE" %}<p>Covering teacher: {{ item.substitute_teacher.user.get_full_name|default:item.substitute_teacher.user.username }} | Room {{ item.room }}</p>{% elif item.adjustment_type == "LIBRARY" %}<p>Library period{% if item.room %} | Room {{ item.room }}{% else %} | Room not assigned{% endif %}</p>{% else %}<p>{{ item.custom_activity }}{% if item.room %} | Room {{ item.room }}{% endif %}</p>{% endif %}</article>{% empty %}<p>No upcoming class changes.</p>{% endfor %}
+    </section>
+
+    <section class="panel section" id="notifications">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Notifications &amp; Announcements</h2>
+        {% for item in notifications %}<article class="record"><span class="pill">{{ item.type }}</span><h3 class="h5 mt-2">{{ item.title }}</h3><p class="text-secondary">{{ item.date|date:"M j, Y" }}</p><p style="white-space:pre-wrap;">{{ item.text }}</p></article>{% empty %}<p>No new notices or upcoming items.</p>{% endfor %}
+    </section>
+
+    <section class="panel section" id="messages">
+        <button class="btn btn-outline-primary mb-3" onclick="showParentHome()">Back to dashboard</button>
+        <h2>Teacher Communication</h2>
+        <form method="post" class="record">
+            {% csrf_token %}<input type="hidden" name="action" value="send_parent_message"><input type="hidden" name="student_link_id" value="{{ student_link.pk }}">
+            <label class="form-label" for="teacher">Assigned teacher</label><select class="form-select mb-3" id="teacher" name="teacher_id" required><option value="">Choose a teacher</option>{% for teacher in teachers %}<option value="{{ teacher.pk }}">{{ teacher.user.get_full_name|default:teacher.user.username }}</option>{% endfor %}</select>
+            <label class="form-label" for="parent-message">Message</label><textarea class="form-control mb-3" id="parent-message" name="message" rows="3" maxlength="4000" required></textarea>
+            <button class="btn btn-primary" type="submit" {% if not teachers %}disabled{% endif %}>Send to teacher</button>
+            {% if not teachers %}<p class="small text-secondary mt-2">No active teacher is assigned to this student's subjects.</p>{% endif %}
+        </form>
+        {% for item in parent_messages %}<article class="record"><div class="text-secondary">{{ item.created_at|date:"M j, Y, g:i a" }}  {{ item.teacher.user.get_full_name|default:item.teacher.user.username }}</div><strong>{% if item.sender_id == request.user.pk %}You{% else %}Teacher{% endif %}</strong><p style="white-space:pre-wrap;">{{ item.message }}</p></article>{% empty %}<p>No messages yet.</p>{% endfor %}
+    </section>
+</main>
+{% if unread_announcements or unread_parent_updates %}
+<div id="parentUpdatesModal" style="position:fixed;inset:0;background:#0f172acc;z-index:1000;display:grid;place-items:center;padding:18px;">
+    <section style="width:min(100%,700px);max-height:85vh;overflow:auto;background:#fff;border-radius:22px;padding:26px;color:#172554;box-shadow:0 28px 90px #02061766;">
+        <h2 class="h4 fw-bold">New updates for your child</h2>
+        <form id="parentUpdatesForm" method="post" action="{% url 'mark_announcements_read' %}">
+            {% csrf_token %}
+            {% for item in unread_announcements %}<input type="hidden" name="announcement_ids" value="{{ item.pk }}">{% endfor %}
+            {% for item in unread_parent_updates %}<input type="hidden" name="notice_keys" value="{{ item.key }}">{% endfor %}
+            {% for item in unread_announcements %}<article class="record"><span class="pill">Announcement</span><h3 class="h5 mt-2">{{ item.title }}</h3><p style="white-space:pre-wrap;">{{ item.message }}</p><small class="text-secondary">{{ item.created_at|date:"M j, Y" }}</small></article>{% endfor %}
+            {% for item in unread_parent_updates %}<article class="record"><span class="pill">{{ item.type }}</span><h3 class="h5 mt-2">{{ item.title }}</h3><p class="mb-0">{{ item.detail }}</p></article>{% endfor %}
+        </form>
+        <button class="btn btn-primary w-100" type="button" onclick="closeParentUpdates()">Got it</button>
+    </section>
+</div>
+{% endif %}
+<script>
+    function closeParentUpdates() {
+        var modal = document.getElementById("parentUpdatesModal");
+        var form = document.getElementById("parentUpdatesForm");
+        if (!modal || !form) return;
+        modal.remove();
+        fetch(form.action, {
+            method: "POST",
+            body: new FormData(form),
+            headers: {"X-Requested-With": "XMLHttpRequest"}
+        });
+    }
+    function showParentSection(name) {
+        document.querySelectorAll(".section").forEach(function(section) { section.classList.remove("active"); });
+        document.querySelectorAll(".panel.section").forEach(function(section) { section.style.display = "none"; });
+        document.getElementById("home-metrics").classList.remove("active");
+        document.getElementById("parent-cards").classList.remove("active");
+        var panel = document.getElementById(name);
+        panel.classList.add("active");
+        panel.style.display = "block";
+        history.replaceState(null, "", "?child={{ student_link.pk }}&section=" + encodeURIComponent(name));
+        window.scrollTo(0, 0);
+    }
+    function showParentHome() {
+        document.querySelectorAll(".panel.section").forEach(function(section) { section.style.display = "none"; section.classList.remove("active"); });
+        document.getElementById("home-metrics").classList.add("active");
+        document.getElementById("parent-cards").classList.add("active");
+        history.replaceState(null, "", "?child={{ student_link.pk }}");
+        window.scrollTo(0, 0);
+    }
+    // Treat leaving the parent dashboard with the browser Back button as logout.
+    // A duplicate history entry lets us catch Back before the login page is restored.
+    let parentBackLogoutPending = false;
+    history.pushState({parentPortalGuard: true}, "", window.location.href);
+    window.addEventListener("popstate", function() {
+        if (parentBackLogoutPending) return;
+        parentBackLogoutPending = true;
+        const logoutForm = document.getElementById("parentLogoutForm");
+        fetch(logoutForm.action, {
+            method: "POST",
+            body: new FormData(logoutForm),
+            credentials: "same-origin"
+        }).then(function(response) {
+            if (!response.ok) throw new Error("Logout failed");
+            window.location.replace("{% url 'parent_login' %}");
+        }).catch(function() {
+            parentBackLogoutPending = false;
+            history.pushState({parentPortalGuard: true}, "", window.location.href);
+        });
+    });
+    const requestedSection = new URLSearchParams(window.location.search).get("section");
+    if (requestedSection && document.getElementById(requestedSection)) showParentSection(requestedSection);
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -941,6 +941,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
 
@@ -960,7 +961,7 @@
             <a href="{% url 'adminpanel' %}"
                class="navbar-brand text-decoration-none">
 
-                🎓 FaceAttend
+                 FaceAttend
 
             </a>
 
@@ -968,7 +969,7 @@
             <a href="{% url 'adminpanel' %}"
                class="back-btn">
 
-                ← Dashboard
+                 Dashboard
 
             </a>
 
@@ -1022,7 +1023,7 @@
 
             <h1 class="page-title">
 
-                📚 Subject <span>Management</span>
+                 Subject <span>Management</span>
 
             </h1>
 
@@ -1039,7 +1040,7 @@
                 data-bs-toggle="modal"
                 data-bs-target="#addSubjectModal">
 
-            ＋ Add Subject
+             Add Subject
 
         </button>
 
@@ -1060,7 +1061,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon icon-purple">
-                    📚
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1087,7 +1088,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon icon-green">
-                    ✓
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1114,7 +1115,7 @@
             <div class="stat-card">
 
                 <div class="stat-icon icon-cyan">
-                    🏫
+                    
                 </div>
 
                 <div class="stat-number">
@@ -1242,7 +1243,7 @@
                         type="submit"
                         class="filter-btn w-100">
 
-                        🔍 Filter
+                         Filter
 
                     </button>
 
@@ -1328,7 +1329,7 @@
                             <div class="subject-name">
 
                                 <div class="subject-icon">
-                                    📖
+                                    
                                 </div>
 
                                 {{ subject.name }}
@@ -1387,7 +1388,7 @@
 
                                 <span class="badge-custom badge-active">
 
-                                    ● Active
+                                     Active
 
                                 </span>
 
@@ -1395,7 +1396,7 @@
 
                                 <span class="badge-custom badge-inactive">
 
-                                    ● Inactive
+                                     Inactive
 
                                 </span>
 
@@ -1416,9 +1417,7 @@
                                 class="action-btn edit-btn me-1"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editSubjectModal{{ subject.id }}"
-                                title="Edit Subject">
-
-                                ✏️
+                                title="Edit Subject">Edit
 
                             </button>
 
@@ -1427,17 +1426,11 @@
 
                             {% if subject.attendance_count == 0 %}
 
-                                <a
-                                    href="{% url 'delete_subject' subject.id %}"
-                                    class="action-btn delete-btn"
-                                    title="Delete Subject"
-                                    onclick="return confirm(
-                                        'Are you sure you want to delete {{ subject.name }}?'
-                                    );">
-
-                                    🗑️
-
-                                </a>
+                                <form method="post" action="{% url 'delete_subject' subject.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="action-btn delete-btn" title="Delete Subject"
+                                            onclick="return confirm('Are you sure you want to delete {{ subject.name }}?');">Delete</button>
+                                </form>
 
                             {% else %}
 
@@ -1447,9 +1440,7 @@
                                     title="Cannot delete subject with attendance records"
                                     onclick="alert(
                                         'This subject has attendance records and cannot be deleted. Deactivate it instead.'
-                                    );">
-
-                                    🔒
+                                    );">Unavailable
 
                                 </button>
 
@@ -1475,7 +1466,7 @@
             <div class="empty-state">
 
                 <div class="empty-icon">
-                    📚
+                    
                 </div>
 
                 <h4>
@@ -1491,7 +1482,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#addSubjectModal">
 
-                    ＋ Add Subject
+                     Add Subject
 
                 </button>
 
@@ -1535,7 +1526,7 @@
 
                         <h5 class="modal-title">
 
-                            ✏️ Edit Subject
+                             Edit Subject
 
                         </h5>
 
@@ -1708,7 +1699,7 @@
 
                     <h5 class="modal-title">
 
-                        📚 Add New Subject
+                         Add New Subject
 
                     </h5>
 

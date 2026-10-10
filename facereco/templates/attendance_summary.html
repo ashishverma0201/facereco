@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -56,15 +56,17 @@
       font-weight: bold;
     }
   </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 <body class="container mt-5">
 
   <div class="card">
-    <h2 class="mb-4 text-center">📊 Attendance Summary</h2>
+    <h2 class="mb-4 text-center"> Attendance Summary</h2>
 
     <div class="summary-info mb-4">
       <p><strong>Total Attended:</strong> {{ total_attended }}</p>
       <p><strong>Total Classes:</strong> {{ overall_total_classes }}</p>
+      <p><strong>Approved leave credit:</strong> {{ total_leave_credit }} classes (overall cap: 5 percentage points; requires at least 75% raw overall attendance)</p>
       <p><strong>Overall Percentage:</strong> 
         <span class="{% if overall_percentage >= 75 %}percentage-high{% else %}percentage-low{% endif %}">
           {{ overall_percentage }}%
@@ -84,6 +86,7 @@
         <tr>
           <th>Subject</th>
           <th>Attended</th>
+          <th>Approved Leave Credit</th>
           <th>Total Classes</th>
           <th>Percentage</th>
         </tr>
@@ -93,6 +96,7 @@
         <tr>
           <td>{{ item.name }}</td>
           <td>{{ item.attended }}</td>
+          <td>{{ item.leave_credited }}</td>
           <td>{{ item.total }}</td>
           <td>
             <span class="{% if item.percentage >= 75 %}percentage-high{% else %}percentage-low{% endif %}">
@@ -102,7 +106,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4">No subjects found for your semester.</td>
+          <td colspan="5">No subjects found for your semester.</td>
         </tr>
         {% endfor %}
       </tbody>

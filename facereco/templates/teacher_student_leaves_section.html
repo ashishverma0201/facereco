@@ -1,0 +1,28 @@
+﻿<section class="section" id="student-leaves">
+    <div class="card" style="padding:24px; margin-bottom:22px;">
+        <h2>Student Leave Requests</h2>
+        <p>Review requests for your assigned subjects.</p>
+        <div class="alert alert-info">Approved leave credits scheduled class sessions only. It applies when raw overall attendance is at least 75%, up to 5 percentage points across all subjects.</div>
+    </div>
+    {% for application in student_leave_applications %}
+    <article class="card" style="padding:24px; margin-bottom:16px;">
+        <div class="d-flex justify-content-between flex-wrap gap-2"><div><h3>{{ application.student.student_name }}  {{ application.subject.name }}</h3><p>Roll {{ application.student.roll_no }}  Semester {{ application.student.semester }}  {{ application.student.branch }}</p></div><span class="badge {% if application.status == 'APPROVED' %}text-bg-success{% elif application.status == 'REJECTED' %}text-bg-danger{% else %}text-bg-warning{% endif %}">{{ application.get_status_display }}</span></div>
+        <p><strong>Dates:</strong> {{ application.start_date|date:"M j, Y" }}{% if application.end_date != application.start_date %}  {{ application.end_date|date:"M j, Y" }}{% endif %}</p>
+        <p><strong>Reason:</strong><br>{{ application.reason|linebreaksbr }}</p>
+        {% if application.status == "PENDING" %}
+        <form method="post" class="border-top pt-3">{% csrf_token %}
+            <input type="hidden" name="action" value="review_student_leave">
+            <input type="hidden" name="application_id" value="{{ application.pk }}">
+            <label class="form-label" for="teacher-note-{{ application.pk }}">
+                Note for student (optional)</label><textarea class="form-control mb-3" id="teacher-note-{{ application.pk }}" name="teacher_note" rows="2" maxlength="2000"></textarea>
+            <button class="action-btn" name="decision" value="APPROVED" type="submit">
+                Approve leave</button>
+                <button class="action-btn ms-2" name="decision" value="REJECTED" type="submit">Reject</button>
+        </form>
+        {% elif application.teacher_note %}
+        <p class="text-secondary">Note: {{ application.teacher_note }}</p>
+        {% endif %}
+    </article>
+    {% empty %}<div class="card" style="padding:24px;">
+        No student leave requests have been sent to you.</div>{% endfor %}
+</section>

@@ -1,0 +1,23 @@
+﻿<section class="section" id="parent-messages">
+    <h2>Parent messages</h2>
+    <p>Reply to parents linked to students in your assigned classes.</p>
+    {% for message in parent_messages %}
+    <article class="card" style="padding:20px; margin-bottom:14px;">
+        <div><strong>{{ message.student_link.parent.user.get_full_name|default:message.student_link.parent.user.email }}</strong>  {{ message.student_link.student.student_name }} ({{ message.student_link.student.roll_no }})</div>
+        <div class="text-muted">{{ message.created_at|date:"M j, Y, g:i a" }}  {% if message.sender_id == message.teacher.user_id %}Teacher reply{% else %}Parent message{% endif %}</div>
+        <p class="mt-2" style="white-space:pre-wrap;">{{ message.message }}</p>
+        {% if message.sender_id != message.teacher.user_id %}
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reply_parent_message">
+            <input type="hidden" name="message_id" value="{{ message.pk }}">
+            <label class="form-label" for="reply-{{ message.pk }}">Reply</label>
+            <textarea class="form-control mb-2" id="reply-{{ message.pk }}" name="message" maxlength="4000" rows="2" required></textarea>
+            <button class="action-btn" type="submit">Send reply</button>
+        </form>
+        {% endif %}
+    </article>
+    {% empty %}
+    <div class="card" style="padding:20px;">No parent messages yet.</div>
+    {% endfor %}
+</section>

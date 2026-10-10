@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_zi8s3=%ohsrceiflpnv#4d*rzcr2d9e-*nq(dbkjs7mcrw3)3'
+# Configure these in the environment for deployment. The fallback is only for local development.
+DEBUG = os.environ.get("DJANGO_DEBUG", "true").strip().lower() in {"1", "true", "yes", "on"}
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("Set DJANGO_SECRET_KEY when DJANGO_DEBUG is false.")
+    SECRET_KEY = "django-insecure-local-development-key-only-do-not-deploy"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "127.0.0.1,localhost" if DEBUG else "",
+    ).split(",")
+    if host.strip()
+]
+if not DEBUG and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured("Set DJANGO_ALLOWED_HOSTS to your production hostnames.")
 
 
 # Application definition
@@ -47,9 +59,22 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'facereco.middleware.SessionInactivityTimeoutMiddleware',
+    'facereco.middleware.AdminMFAGateMiddleware',
+    'facereco.middleware.NoCacheAuthenticatedMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_IDLE_TIMEOUT = 30 * 60
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
 
 ROOT_URLCONF = 'faceattendence.urls'
 
@@ -73,15 +98,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'faceattendence.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Keep SQLite local for development. Production credentials are supplied only
+# through environment variables; bind the database privately at the host level.
+DATABASE_ENGINE = os.environ.get("DJANGO_DB_ENGINE", "django.db.backends.sqlite3").strip()
+if DATABASE_ENGINE == "django.db.backends.sqlite3":
+    if not DEBUG:
+        raise ImproperlyConfigured("Configure a production database with DJANGO_DB_ENGINE and DJANGO_DB_NAME.")
+    DATABASES = {
+        "default": {
+            "ENGINE": DATABASE_ENGINE,
+            "NAME": os.environ.get("DJANGO_DB_NAME", str(BASE_DIR / "db.sqlite3")),
+        }
     }
-}
+else:
+    DATABASE_NAME = os.environ.get("DJANGO_DB_NAME")
+    if not DATABASE_NAME:
+        raise ImproperlyConfigured("Set DJANGO_DB_NAME for the configured production database.")
+    DATABASES = {
+        "default": {
+            "ENGINE": DATABASE_ENGINE,
+            "NAME": DATABASE_NAME,
+            "USER": os.environ.get("DJANGO_DB_USER", ""),
+            "PASSWORD": os.environ.get("DJANGO_DB_PASSWORD", ""),
+            "HOST": os.environ.get("DJANGO_DB_HOST", "127.0.0.1"),
+            "PORT": os.environ.get("DJANGO_DB_PORT", ""),
+            "CONN_MAX_AGE": int(os.environ.get("DJANGO_DB_CONN_MAX_AGE", "60")),
+        }
+    }
 
 
 # Password validation
@@ -101,6 +144,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Django invalidates password-reset tokens after use and rejects them after this timeout.
+PASSWORD_RESET_TIMEOUT = 60 * 60
 
 
 # Internationalization
@@ -125,6 +171,19 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Password reset emails use the console in local development. Configure an
+# SMTP backend and credentials through environment variables for deployment.
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "true").lower() == "true"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@school.local")
+
 #added manually
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,"static")
@@ -132,3 +191,6 @@ STATICFILES_DIRS=[
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_media'
+FILE_UPLOAD_PERMISSIONS = 0o600
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o700

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -74,6 +74,7 @@
       padding: 8px 12px;
     }
   </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 <body>
 
@@ -88,31 +89,24 @@
 
     <form method="post">
       {% csrf_token %}
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input
-          type="text"
-          class="form-control"
-          id="username"
-          name="username"
-          placeholder="Enter admin username"
-          required
-        />
-      </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          name="password"
-          placeholder="Enter password"
-          required
-        />
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">Login</button>
+      {% if mfa_pending %}
+        <p class="text-muted">Enter the one-time code sent to your administrator email. It expires in 5 minutes.</p>
+        <div class="mb-3">
+          <label for="mfa_code" class="form-label">Sign-in code</label>
+          <input type="text" class="form-control" id="mfa_code" name="mfa_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Verify and sign in</button>
+      {% else %}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Enter admin username" autocomplete="username" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+      {% endif %}
     </form>
   </div>
 

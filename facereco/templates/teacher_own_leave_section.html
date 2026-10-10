@@ -1,0 +1,19 @@
+﻿<section class="section" id="my-leave">
+    <div class="card" style="padding:24px; margin-bottom:22px;">
+        <h2>My Leave</h2><p>Your leave applications are reviewed by the admin.</p>
+        <form method="post" class="row g-3">{% csrf_token %}<input type="hidden" name="action" value="submit_teacher_leave">
+            <div class="col-md-6"><label class="form-label" for="own-leave-start">From</label><input class="form-control" id="own-leave-start" type="date" name="start_date" required></div>
+            <div class="col-md-6"><label class="form-label" for="own-leave-end">To</label><input class="form-control" id="own-leave-end" type="date" name="end_date" required></div>
+            <div class="col-12"><label class="form-label" for="own-leave-reason">Reason</label><textarea class="form-control" id="own-leave-reason" name="reason" rows="3" maxlength="2000" required></textarea></div>
+            <div class="col-12"><button class="action-btn" type="submit">Send to admin</button></div>
+        </form>
+    </div>
+    <div class="card" style="padding:24px;"><h2>My leave history</h2><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Dates</th><th>Reason</th><th>Status</th><th>Admin note</th></tr></thead><tbody>
+        {% for application in own_leave_applications %}<tr><td>{{ application.start_date|date:"M j, Y" }}{% if application.end_date != application.start_date %}  {{ application.end_date|date:"M j, Y" }}{% endif %}</td><td>{{ application.reason|linebreaksbr }}</td><td><span class="badge {% if application.status == 'APPROVED' %}text-bg-success{% elif application.status == 'REJECTED' %}text-bg-danger{% else %}text-bg-warning{% endif %}">{{ application.get_status_display }}</span></td><td>{{ application.admin_note|default:"" }}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">No leave requests yet.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+    <div class="card mt-4" style="padding:24px;"><h2>Class adjustments</h2><p>See changes to your classes when you are away, and any classes assigned to you as a substitute.</p><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Date &amp; time</th><th>Subject</th><th>Your role</th><th>Adjustment</th></tr></thead><tbody>
+        {% for adjustment in teacher_adjustments %}<tr><td>{{ adjustment.class_date|date:"M j, Y" }} | {{ adjustment.start_time|time:"H:i" }} - {{ adjustment.end_time|time:"H:i" }}</td><td>{{ adjustment.subject.name }}</td><td>{% if adjustment.leave_application.teacher_id == teacher.pk %}Your class (you are on leave){% else %}Substitute teacher{% endif %}</td><td>{% if adjustment.adjustment_type == "SUBSTITUTE" %}{% if adjustment.substitute_teacher_id == teacher.pk %}You are covering{% else %}Covered by {{ adjustment.substitute_teacher.user.get_full_name|default:adjustment.substitute_teacher.user.username }}{% endif %} | Room {{ adjustment.room }}{% elif adjustment.adjustment_type == "LIBRARY" %}Library period{% if adjustment.room %} | Room {{ adjustment.room }}{% else %} | Room not assigned{% endif %}{% else %}{{ adjustment.custom_activity }}{% if adjustment.room %} | Room {{ adjustment.room }}{% endif %}{% endif %}{% if adjustment.admin_note %}<br><span class="text-secondary">{{ adjustment.admin_note }}</span>{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-secondary">No class adjustments yet.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+</section>

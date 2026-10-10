@@ -1,0 +1,558 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Management | FaceAttend</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f4f5fb;
+            color: #252541;
+        }
+
+        .container { max-width: 1500px; margin: auto; }
+
+        .header {
+            background: linear-gradient(135deg, #32206f, #7048d9);
+            color: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+        }
+
+        .header h1 { margin: 0 0 8px; }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(20,20,60,.07);
+        }
+
+        h2 { margin-top: 0; color: #33236f; }
+        h3 { color: #4936a1; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(210px,1fr));
+            gap: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d6d8e5;
+            border-radius: 7px;
+            background: white;
+            color: #222;
+        }
+
+        .help, .note {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 19px;
+            margin: 15px 7px 0 0;
+            border: 0;
+            border-radius: 8px;
+            background: #6240cf;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover { background: #4828a7; }
+
+        .message {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .success { background: #e4f8eb; color: #176337; }
+        .error { background: #ffe7e7; color: #a51f1f; }
+
+        .table-wrapper { width: 100%; overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #dedfeb;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th { background: #efedfb; color: #34256d; }
+
+        .requirements-table { min-width: 1000px; }
+
+        .requirements-table td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .requirements-table input,
+        .requirements-table select { min-width: 110px; }
+
+        .timetable {
+            min-width: 1050px;
+            table-layout: auto;
+        }
+
+        .timetable th { white-space: nowrap; }
+
+        .timetable td { min-width: 115px; height: 80px; }
+
+        .class-cell {
+            background: #f1edff;
+            border: 1px solid #cfc1ff;
+            border-radius: 6px;
+            padding: 8px;
+            min-height: 60px;
+            overflow-wrap: anywhere;
+        }
+
+        .class-cell.lab {
+            background: #e3f5ff;
+            border-color: #9cdafa;
+        }
+
+        .class-cell strong {
+            display: block;
+            color: #38247b;
+            margin-bottom: 5px;
+        }
+
+        .class-cell small {
+            display: block;
+            margin-top: 4px;
+            color: #45445c;
+        }
+
+        .lunch {
+            background: #fff3d8 !important;
+            font-weight: bold;
+            color: #78520c !important;
+        }
+
+        .empty-cell { color: #aaa; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .legend span {
+            padding: 7px 10px;
+            border-radius: 6px;
+        }
+
+        .theory-legend { background: #f1edff; }
+        .lab-legend { background: #e3f5ff; }
+
+        @media(max-width:650px) {
+            body { padding: 10px; }
+            .card { padding: 14px; }
+            .header { padding: 18px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print, .configuration-card, .message {
+                display: none !important;
+            }
+            .card { box-shadow: none; padding: 0; }
+            .table-wrapper { overflow: visible; }
+            .timetable { min-width: 100%; font-size: 9px; }
+            .timetable th, .timetable td {
+                min-width: 0;
+                padding: 4px;
+            }
+            .timetable td { height: 55px; }
+            .header {
+                background: white;
+                color: black;
+                padding: 10px;
+            }
+        }
+    </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>Timetable Management</h1>
+        <p>Automatic weekly timetable generation and classroom allocation</p>
+    </div>
+
+    {% if error_message %}
+        <div class="message error">{{ error_message }}</div>
+    {% endif %}
+
+    {% if success_message %}
+        <div class="message success">{{ success_message }}</div>
+    {% endif %}
+
+    <!-- STEP 1: Select class -->
+    <section class="card configuration-card">
+        <h2>1. Select Academic Class</h2>
+
+        <form method="get">
+            <div class="grid">
+                <div class="field">
+                    <label>Academic Year</label>
+                    <select name="academic_year" required>
+                        <option value="2026-2027"
+                            {% if academic_year == "2026-2027" %}selected{% endif %}>
+                            2026-2027
+                        </option>
+                        <option value="2027-2028"
+                            {% if academic_year == "2027-2028" %}selected{% endif %}>
+                            2027-2028
+                        </option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Branch</label>
+                    <select name="branch" required>
+                        {% for item in branches %}
+                            <option value="{{ item }}"
+                                {% if branch == item %}selected{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Semester</label>
+                    <select name="semester" required>
+                        {% for value, label in semester_choices %}
+                            <option value="{{ value }}"
+                                {% if semester == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" type="submit">Load Subjects</button>
+        </form>
+    </section>
+
+    <!-- STEP 2: Settings and requirements -->
+    <section class="card configuration-card">
+        <h2>2. College Timings and Room Allocation</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <input type="hidden" name="academic_year" value="{{ academic_year }}">
+            <input type="hidden" name="branch" value="{{ branch }}">
+            <input type="hidden" name="semester" value="{{ semester }}">
+
+            <div class="grid">
+                <div class="field">
+                    <label>College Start</label>
+                    <input type="time" name="college_start" required
+                        value="{% if configuration %}{{ configuration.college_start|time:'H:i' }}{% else %}09:00{% endif %}">
+                </div>
+
+                <div class="field">
+                    <label>College End</label>
+                    <input type="time" name="college_end" required
+                        value="{% if configuration %}{{ configuration.college_end|time:'H:i' }}{% else %}16:00{% endif %}">
+                </div>
+
+                <div class="field">
+                    <label>Lunch Start</label>
+                    <input type="time" name="lunch_start" required
+                        value="{% if configuration %}{{ configuration.lunch_start|time:'H:i' }}{% else %}13:00{% endif %}">
+                </div>
+
+                <div class="field">
+                    <label>Lunch End</label>
+                    <input type="time" name="lunch_end" required
+                        value="{% if configuration %}{{ configuration.lunch_end|time:'H:i' }}{% else %}13:30{% endif %}">
+                </div>
+
+                <div class="field">
+                    <label>Working Days Per Week</label>
+                    <select name="working_days" required>
+                        {% for day_count in "1234567" %}
+                            <option value="{{ day_count }}"
+                                {% if configuration and configuration.working_days|stringformat:"s" == day_count %}
+                                    selected
+                                {% elif not configuration and day_count == "6" %}
+                                    selected
+                                {% endif %}>
+                                {{ day_count }} days
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Theory Period (minutes)</label>
+                    <input type="number" name="default_theory_duration"
+                        min="1" max="600" required
+                        value="{% if configuration %}{{ configuration.default_theory_duration }}{% else %}50{% endif %}">
+                </div>
+
+                <div class="field">
+                    <label>Theory Classrooms</label>
+                    <input type="text" value="{{ theory_rooms_for_form }}" readonly>
+                    <span class="help">Manage these rooms from the Classrooms &amp; Facilities card in the admin panel.</span>
+                </div>
+
+                <div class="field">
+                    <label>Practical / Lab Rooms</label>
+                    <input type="text" value="{{ lab_rooms_for_form }}" readonly>
+                    <span class="help">Active lab rooms are managed in the admin panel's room inventory.</span>
+                </div>
+            </div>
+
+            <h3>Subject-wise Weekly Requirements</h3>
+            <p class="note">
+                Set the number and duration of weekly theory and lab sessions.
+                Choose an active teacher assigned to each subject.
+            </p>
+
+            {% if subject_rows %}
+                <div class="table-wrapper">
+                    <table class="requirements-table">
+                        <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Theory / Week</th>
+                            <th>Theory Minutes</th>
+                            <th>Labs / Week</th>
+                            <th>Lab Minutes</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for row in subject_rows %}
+                            <tr>
+                                <td>{{ row.subject.name }}</td>
+
+                                <td>
+                                    <select name="teacher_{{ row.subject.id }}">
+                                        <option value="">Select Teacher</option>
+                                        {% for teacher in row.teachers %}
+                                            <option value="{{ teacher.id }}"
+                                                {% if row.requirement and row.requirement.teacher_id == teacher.id %}selected{% endif %}>
+                                                {{ teacher.user.get_full_name|default:teacher.user.username }}
+                                                ({{ teacher.employee_id }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                        name="theory_count_{{ row.subject.id }}"
+                                        min="0" max="30"
+                                        value="{% if row.requirement %}{{ row.requirement.theory_classes_per_week }}{% else %}0{% endif %}">
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                        name="theory_duration_{{ row.subject.id }}"
+                                        min="1" max="600"
+                                        value="{% if row.requirement %}{{ row.requirement.theory_duration_minutes }}{% else %}50{% endif %}">
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                        name="lab_count_{{ row.subject.id }}"
+                                        min="0" max="30"
+                                        value="{% if row.requirement %}{{ row.requirement.lab_classes_per_week }}{% else %}0{% endif %}">
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                        name="lab_duration_{{ row.subject.id }}"
+                                        min="1" max="600"
+                                        value="{% if row.requirement %}{{ row.requirement.lab_duration_minutes }}{% else %}120{% endif %}">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn" type="submit" name="action" value="save">
+                    Save Settings
+                </button>
+
+                <button class="btn" type="submit" name="action" value="generate">
+                    Generate Timetable
+                </button>
+            {% else %}
+                <p>No active subjects found for this branch and semester.</p>
+                <p class="note">
+                    Add active subjects and assign teachers before generating.
+                </p>
+            {% endif %}
+        </form>
+    </section>
+
+    <!-- STEP 3: Generated timetable -->
+    {% if generation_done or generated_slots %}
+        <section class="card">
+            <h2>3. Generated Weekly Timetable</h2>
+
+            <p>
+                <strong>Academic Year:</strong> {{ academic_year }}
+                &nbsp; | &nbsp;
+                <strong>Branch:</strong> {{ branch }}
+                &nbsp; | &nbsp;
+                <strong>Semester:</strong> {{ semester }}
+            </p>
+
+            {% if generation_conflicts %}
+                <div class="message error">
+                    <strong>Scheduling conflicts found</strong>
+                    <ul>
+                        {% for conflict in generation_conflicts %}
+                            <li>{{ conflict }}</li>
+                        {% endfor %}
+                    </ul>
+                    No new timetable was saved.
+                </div>
+            {% endif %}
+
+            {% if generated_slots %}
+                <div class="legend">
+                    <span class="theory-legend">Theory classroom</span>
+                    <span class="lab-legend">Practical / lab</span>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="timetable">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                {% for header in timetable_headers %}
+                                    <th class="{% if header.is_lunch %}lunch{% endif %}">
+                                        {{ header.label }}
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for row in timetable_rows %}
+                                <tr>
+                                    <th>{{ row.day_name }}</th>
+
+                                    {% for cell in row.cells %}
+                                        {% if cell.is_lunch %}
+                                            <td class="lunch">Lunch</td>
+
+                                        {% elif cell.slot %}
+                                            <td colspan="{{ cell.colspan }}">
+                                                <div class="class-cell {% if cell.slot.session_type == 'LAB' %}lab{% endif %}">
+                                                    <strong>
+                                                        {{ cell.slot.subject.name }}
+                                                    </strong>
+
+                                                    <small>
+                                                        {{ cell.slot.start_time|time:"H:i" }} -
+                                                        {{ cell.slot.end_time|time:"H:i" }}
+                                                    </small>
+
+                                                    <small>
+                                                        {{ cell.slot.teacher.user.get_full_name|default:cell.slot.teacher.user.username }}
+                                                    </small>
+
+                                                    <small>
+                                                        Room: {{ cell.slot.room|default:"Not assigned" }}
+                                                    </small>
+
+                                                    <small>
+                                                        {{ cell.slot.get_session_type_display }}
+                                                    </small>
+                                                </div>
+                                            </td>
+
+                                        {% else %}
+                                            <td class="empty-cell">-</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn no-print" type="button"
+                    onclick="window.print()">
+                    Print Timetable
+                </button>
+
+{% if not published_timetable %}
+<form method="post" class="no-print">
+    {% csrf_token %}
+
+    <input type="hidden" name="action" value="publish">
+    <input type="hidden" name="academic_year" value="{{ academic_year }}">
+    <input type="hidden" name="branch" value="{{ branch }}">
+    <input type="hidden" name="semester" value="{{ semester }}">
+
+    <button class="btn" type="submit"
+        onclick="return confirm('Publish this timetable for students?');">
+        Publish Timetable
+    </button>
+</form>
+{% endif %}
+
+
+                <p class="note">
+                    {% if published_timetable %}Status: Published. No class, teacher, or room conflicts found.{% else %}Status: Draft. Review the schedule before publishing.{% endif %}
+                </p>
+
+            {% elif not generation_conflicts %}
+                <p>No timetable sessions are available to display.</p>
+            {% endif %}
+        </section>
+    {% endif %}
+
+</div>
+</body>
+</html>
+

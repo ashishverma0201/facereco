@@ -1,237 +1,930 @@
+﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>User Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <style>
-    /* Body & background */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #e2eafc);
-      min-height: 100vh;
-      padding-top: 70px;
-      position: relative;
-      overflow-x: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | FaceAttend</title>
 
-    /* Navbar */
-    .navbar {
-      background: linear-gradient(90deg, #0d6efd, #5a8dee);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-    }
-    .navbar-brand {
-      font-weight: bold;
-      font-size: 1.6rem;
-      color: #fff !important;
-      transition: color 0.3s ease;
-    }
-    .navbar-nav .nav-link {
-      color: #fff !important;
-      font-weight: 500;
-      margin-left: 15px;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-    .navbar-nav .nav-link::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background: #ffd700;
-      transition: width 0.3s ease;
-    }
-    .navbar-nav .nav-link:hover::after {
-      width: 100%;
-    }
-    .navbar-nav .nav-link:hover {
-      color: #ffd700 !important;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 5px;
-      padding: 5px 10px;
-    }
-    .btn-warning {
-      font-weight: 700;
-      border-radius: 50px;
-      padding: 8px 20px;
-      transition: all 0.3s ease;
-      background: linear-gradient(45deg, #ffd700, #ffb347);
-    }
-    .btn-warning:hover {
-      background: linear-gradient(45deg, #ffb347, #ffd700);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
-    }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    /* Dashboard Content / Cards */
-    .dashboard-content {
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 20px;
-      padding: 40px 30px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-      margin: 0 auto;
-      max-width: 700px;
-      text-align: center;
-      transition: all 0.4s ease;
-    }
-    .dashboard-content:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 20px 60px rgba(255, 215, 0, 0.25);
-    }
-    .dashboard-content h1 {
-      font-weight: 800;
-      color: #0d6efd;
-      margin-bottom: 25px;
-      letter-spacing: 1.2px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    }
-    .username {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 15px;
-    }
-    p {
-      color: #555;
-      font-size: 1.1rem;
-    }
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --background: #f3f6fc;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
 
-    /* Table Styling */
-    .table thead {
-      background: linear-gradient(90deg, #0d6efd, #5a8dee);
-      color: #fff;
-    }
-    .table-hover tbody tr:hover {
-      background: rgba(255, 215, 0, 0.15);
-      transform: scale(1.01);
-      transition: all 0.2s ease;
-    }
-    .badge.bg-success { background-color: #28a745 !important; }
-    .badge.bg-warning { background-color: #ffc107 !important; }
-    .badge.bg-danger { background-color: #dc3545 !important; }
+        * { box-sizing: border-box; }
 
-    /* List / Notifications */
-    .list-group-item {
-      background: transparent;
-      border: none;
-      padding-left: 0;
-      padding-right: 0;
-    }
+        body {
+            margin: 0;
+            padding-top: 85px;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 8% 12%, rgba(59,130,246,.11), transparent 28%),
+                radial-gradient(circle at 92% 28%, rgba(139,92,246,.09), transparent 25%),
+                linear-gradient(135deg, #f5f8ff 0%, #f8fafc 52%, #f2f5ff 100%);
+            background-attachment: fixed;
+        }
 
-    /* Animated background blobs */
-    body::before, body::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #ffd700, #ffb347);
-      filter: blur(100px);
-      opacity: 0.5;
-      animation: float 10s infinite alternate;
-      z-index: -1;
-    }
-    body::after {
-      width: 400px;
-      height: 400px;
-      background: linear-gradient(135deg, #0d6efd, #5a8dee);
-      bottom: -50px;
-      right: -50px;
-      animation-duration: 12s;
-    }
-    @keyframes float {
-      0% { transform: translateY(0px) translateX(0px); }
-      100% { transform: translateY(-30px) translateX(30px); }
-    }
-  </style>
+        .navbar {
+            background: linear-gradient(110deg, #1d4ed8, #3b82f6);
+            box-shadow: 0 5px 20px rgba(37, 99, 235, .18);
+            padding: 13px 0;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .navbar-nav {
+            align-items: center;
+            gap: 5px;
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-size: .9rem;
+            font-weight: 600;
+            padding: 9px 11px !important;
+            border-radius: 8px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255,255,255,.15);
+        }
+
+        .navbar-toggler {
+            border-color: rgba(255,255,255,.5);
+        }
+
+        .navbar-toggler-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 18px 40px;
+        }
+
+        @keyframes dashboard-enter {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-heading { margin-bottom: 25px; animation: dashboard-enter .55s ease both; }
+
+        .page-heading h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .dashboard-content {
+            background: white;
+            border: 1px solid #e7edf7;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 28px rgba(30,64,175,.06);
+        }
+
+        .student-section-cards {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .student-section-card {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            min-height: 174px;
+            padding: 21px;
+            border: 0;
+            border-radius: 18px;
+            color: white;
+            text-align: left;
+            box-shadow: 0 12px 26px rgba(30,41,59,.12);
+            cursor: pointer;
+            opacity: 0;
+            animation: dashboard-enter .55s ease forwards;
+            transition: transform .22s ease, box-shadow .22s ease;
+        }
+
+        .student-section-card:nth-child(1) { background: linear-gradient(145deg, #2563eb, #1d4ed8 65%, #1e40af); animation-delay: .08s; }
+        .student-section-card:nth-child(2) { background: linear-gradient(145deg, #0891b2, #0e7490 65%, #155e75); animation-delay: .16s; }
+        .student-section-card:nth-child(3) { background: linear-gradient(145deg, #8b5cf6, #7c3aed 65%, #6d28d9); animation-delay: .24s; }
+        .student-section-card:nth-child(4) { background: linear-gradient(145deg, #f59e0b, #ea580c 65%, #c2410c); animation-delay: .32s; }
+        .student-section-card:nth-child(5) { background: linear-gradient(145deg, #10b981, #059669 65%, #047857); animation-delay: .4s; }
+        .student-section-card:nth-child(6) { background: linear-gradient(145deg, #ec4899, #db2777 65%, #be185d); animation-delay: .48s; }
+
+        .student-section-card::after {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            right: -48px;
+            bottom: -66px;
+            border: 1px solid rgba(255,255,255,.24);
+            border-radius: 50%;
+            box-shadow: 0 0 0 18px rgba(255,255,255,.07), 0 0 0 38px rgba(255,255,255,.045);
+            transition: transform .3s ease;
+        }
+
+        .student-section-card:hover {
+            transform: translateY(-6px) scale(1.015);
+            box-shadow: 0 18px 32px rgba(30,41,59,.2);
+        }
+
+        .student-section-card:hover::after { transform: scale(1.12); }
+        .student-section-card strong { display: block; font-size: 1.08rem; margin: 15px 0 7px; position: relative; z-index: 1; }
+        .student-section-card .card-description { display: block; max-width: 190px; color: rgba(255,255,255,.84); font-size: .88rem; line-height: 1.45; position: relative; z-index: 1; }
+        .student-card-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.2); position: relative; z-index: 1; }
+        .student-card-icon svg { width: 22px; height: 22px; fill: none; stroke: white; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .student-overview-section { animation: dashboard-enter .45s ease both; }
+        .back-dashboard-button { margin-bottom: 18px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 5px;
+            height: 24px;
+            border-radius: 5px;
+            background: linear-gradient(#2563eb, #60a5fa);
+        }
+
+        /* Profile */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .profile-item {
+            padding: 16px;
+            background: #f8faff;
+            border: 1px solid #e5ecf8;
+            border-radius: 11px;
+            min-width: 0;
+        }
+
+        .profile-label {
+            display: block;
+            font-size: .82rem;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .profile-value {
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .btn-warning {
+            border: none;
+            border-radius: 9px;
+            padding: 10px 17px;
+            font-weight: 700;
+            background: #fbbf24;
+            color: #422006 !important;
+        }
+
+        .btn-warning:hover { background: #f59e0b; }
+
+        /* General tables */
+        .table-responsive {
+            border: 1px solid var(--border);
+            border-radius: 11px;
+        }
+
+        .table {
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background: #eff4ff;
+            color: #1e40af;
+            padding: 14px;
+            font-size: .85rem;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tbody td {
+            padding: 14px;
+            font-size: .9rem;
+            border-color: #edf1f7;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--muted);
+            padding: 25px !important;
+        }
+
+        /* Weekly timetable grid */
+        .timetable-scroll {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .weekly-table {
+            width: 100%;
+            min-width: 1250px;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        .weekly-table th {
+            background: #eaf0ff;
+            color: #243b70;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+            padding: 15px 8px;
+            border-right: 1px solid #dbe3ef;
+            border-bottom: 1px solid #dbe3ef;
+            white-space: nowrap;
+        }
+
+        .weekly-table th:first-child,
+        .weekly-table td:first-child {
+            width: 105px;
+            min-width: 105px;
+            background: #f4f7fc;
+        }
+
+        .weekly-table th.lunch-heading {
+            background: #fef3c7;
+            color: #92400e;
+            width: 85px;
+        }
+
+        .weekly-table td {
+            padding: 7px;
+            min-width: 130px;
+            height: 120px;
+            vertical-align: top;
+            text-align: center;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .weekly-table th:last-child,
+        .weekly-table td:last-child {
+            border-right: none;
+        }
+
+        .weekly-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .weekly-table td.day-cell {
+            background: #f4f7fc;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .day-label {
+            color: #243b70;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .weekly-table td.lunch-cell {
+            background: #fffbeb;
+            color: #92400e;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 12px;
+            font-weight: 800;
+            min-width: 85px;
+        }
+
+        .class-card {
+            padding: 10px 8px;
+            margin: 0 0 5px;
+            border: 1px solid #d7e2fa;
+            border-left: 3px solid #6366f1;
+            border-radius: 8px;
+            background: #f0edff;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        .class-card.lab {
+            background: #e7f6f8;
+            border-color: #c3e7eb;
+            border-left-color: #0891b2;
+        }
+
+        .class-card strong {
+            display: block;
+            color: #244a99;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .class-card span {
+            display: block;
+            color: #526078;
+            font-size: 10px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .empty-slot {
+            color: #94a3b8;
+            font-size: 18px;
+            padding-top: 30px;
+        }
+
+        .timetable-note {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* Today's timetable */
+        .today-panel {
+            margin-top: 24px;
+            padding: 18px;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            background: #f8faff;
+        }
+
+        .today-panel h2 {
+            color: #243b70;
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .today-card {
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #dbeafe;
+            border-left: 4px solid #3b82f6;
+            border-radius: 9px;
+            background: white;
+        }
+
+        .today-card:last-child { margin-bottom: 0; }
+
+        .today-card strong {
+            display: block;
+            color: #244a99;
+            margin-bottom: 6px;
+        }
+
+        .today-card span {
+            display: block;
+            color: #526078;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Activity */
+        .activity-item {
+            padding: 14px 4px;
+            border-bottom: 1px solid #edf1f7;
+            color: #475569;
+            font-size: .92rem;
+            line-height: 1.6;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+
+        .activity-date {
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1050px) {
+            .student-section-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 600px) {
+            .student-section-cards { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 78px; }
+
+            .navbar-nav {
+                align-items: stretch;
+                padding-top: 12px;
+            }
+
+            .navbar-nav .btn-warning {
+                margin: 8px 0 !important;
+                text-align: center;
+            }
+
+            .navbar-nav .logout-button {
+                width: 100%;
+                margin: 8px 0 !important;
+            }
+
+            .dashboard-container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .dashboard-content { padding: 18px 14px; }
+
+            .profile-grid { grid-template-columns: 1fr; }
+
+            .page-heading h2 { font-size: 1.55rem; }
+        }
+    </style>
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg fixed-top">
+
+<body class="student-dashboard">
+
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="#">My Profile System</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">My Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'myattendance' %}">My Attendance</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'attendance_summary' %}">Attendance Summary</a></li>
-          <li class="nav-item">
-            <a href="{% url 'download_attendance_pdf' %}" class="btn btn-warning text-dark ms-2">Download Report</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+        <a class="navbar-brand" href="#">FaceAttend</a>
 
-  <!-- Dashboard Content -->
-  <div class="container my-5">
-    <!-- Profile Card -->
-    <div class="dashboard-content mb-4">
-      <h1>Profile Info</h1>
-      <p><strong>Name:</strong> {{ profile.student_name|default:user.get_full_name|default:user.username }}</p>
-      
-      <p><strong>Roll Number:</strong> {{ profile.roll_no|default:'N/A' }}</p>
-      <p><strong>Branch:</strong> {{ profile.branch|default:'N/A' }}</p>
-      <a href="{% url 'profile' %}" class="btn btn-warning mt-3">Edit Profile</a>
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'myattendance' %}">My Attendance</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'attendance_summary' %}">Attendance Summary</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="btn btn-warning ms-2"
+                       href="{% url 'download_attendance_pdf' %}">
+                        Download Report
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-light logout-button" type="submit">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="dashboard-container">
+
+    <div class="page-heading student-welcome">
+        <span class="student-welcome-kicker"><i></i> STUDENT PORTAL</span>
+        <h1>Welcome, {{ user.first_name|default:user.username }}</h1>
+        <p>Your classes, attendance and campus updates - all in one place.</p>
+        <div class="student-welcome-meta">
+            <span><b>BRANCH</b> {{ profile.branch|default:"Not assigned" }}</span>
+            <span><b>SEMESTER</b> {{ profile.semester|default:"-" }}</span>
+        </div>
     </div>
 
-    <!-- Attendance Summary Card -->
-    <div class="dashboard-content mb-4">
-      <h1>Attendance Summary</h1>
-      <div class="table-responsive">
-        <table class="table table-hover text-center align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Subject</th>
-              <th>Attended</th>
-              <th>Total</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for record in attendance_summary %}
-            <tr>
-              <td>{{ record.subject_name }}</td>
-              <td>{{ record.attended }}</td>
-              <td>{{ record.total }}</td>
-              <td>
-                <span class="badge {{ record.percentage|floatformat:0|yesno:'bg-success,bg-warning,bg-danger' }}">
-                  {{ record.percentage }}%
+    <div class="student-section-cards">
+        <button type="button" class="student-section-card" onclick="showStudentSection('weeklyTimetablePanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/></svg></span>
+            <strong>Weekly Timetable</strong>
+            <span class="card-description">View your full class schedule for the week.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="showStudentSection('todayTimetablePanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M3 12h2M19 12h2"/></svg></span>
+            <strong>Today's Timetable</strong>
+            <span class="card-description">See the classes scheduled for today.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="showStudentSection('adjustedTimetablePanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></span>
+            <strong>Adjusted Timetable</strong>
+            <span class="card-description">See date-specific class changes caused by approved leave.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="showStudentSection('announcementsPanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13V9a2 2 0 0 1 2-2h3l8-4v16l-8-4H6a2 2 0 0 1-2-2Z"/><path d="m8 15 2 6h4l-2-5M20 8l2-2M20 14l2 2"/></svg></span>
+            <strong>Announcements</strong>
+            <span class="card-description">Read updates for your branch and semester.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="showStudentSection('attendanceSummaryPanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/><path d="M16 6h4v4"/></svg></span>
+            <strong>Attendance Summary</strong>
+            <span class="card-description">Check your attendance by subject and download your report.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="showStudentSection('testsPanel')">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10a2 2 0 0 1 2 2v16H5V5a2 2 0 0 1 2-2Z"/><path d="M9 8h6M9 12h6M9 16h3"/><path d="m15 16 1.5 1.5L20 14"/></svg></span>
+            <strong>Tests &amp; Marks</strong>
+            <span class="card-description">See upcoming tests, covered units, and your marks.</span>
+        </button>
+        <button type="button" class="student-section-card" onclick="window.location.href='{% url 'leave_portal' %}'">
+            <span class="student-card-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <strong>Leave Requests</strong>
+            <span class="card-description">Apply for leave and follow your teacher's decision.</span>
+        </button>
+    </div>
+
+    <!-- Profile -->
+    <section class="dashboard-content student-overview-section">
+        <h1 class="section-title">Profile Information</h1>
+
+        <div class="profile-grid">
+            <div class="profile-item">
+                <span class="profile-label">Student Name</span>
+                <span class="profile-value">
+                    {% if profile %}
+                        {{ profile.student_name }}
+                    {% else %}
+                        {{ user.get_full_name|default:user.username }}
+                    {% endif %}
                 </span>
-              </td>
-            </tr>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Roll Number</span>
+                <span class="profile-value">{{ profile.roll_no|default:"N/A" }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Branch</span>
+                <span class="profile-value">{{ profile.branch|default:"N/A" }}</span>
+            </div>
+        </div>
+
+        <a href="{% url 'profile' %}" class="btn btn-warning mt-4">
+            Edit Profile
+        </a>
+    </section>
+
+    <!-- Attendance Summary -->
+    <section class="dashboard-content student-detail-section" id="attendanceSummaryPanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">Attendance Summary</h1>
+        <p class="text-secondary">Approved leave credit is available when raw overall attendance is at least 75%, and is capped at 5 percentage points across all subjects combined.</p>
+
+        <div class="table-responsive">
+            <table class="table table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Attended</th>
+                        <th>Approved leave credit</th>
+                        <th>Total</th>
+                        <th>Final percentage</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for record in attendance_summary %}
+                    <tr>
+                        <td>{{ record.subject_name }}</td>
+                        <td>{{ record.attended }}</td>
+                        <td>{{ record.leave_credited }}</td>
+                        <td>{{ record.total }}</td>
+                        <td>{{ record.percentage }}%</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            No attendance summary available yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{% url 'attendance_summary' %}" class="btn btn-warning mt-4">
+            View Full Attendance
+        </a>
+
+        <a href="{% url 'download_attendance_pdf' %}" class="btn btn-warning mt-4 ms-2">
+            Download Report
+        </a>
+    </section>
+
+    <!-- Weekly Timetable -->
+    <section class="dashboard-content student-detail-section" id="weeklyTimetablePanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">My Timetable</h1>
+
+        <h2 style="color:#243b70;font-size:16px;font-weight:800;margin-bottom:14px;">
+            Weekly Schedule
+        </h2>
+
+        <div class="timetable-scroll">
+            <div class="timetable-scroll">
+                <table class="weekly-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>09:00 - 10:00</th>
+                            <th>10:00 - 11:00</th>
+                            <th>11:00 - 12:00</th>
+                            <th>12:00 - 13:00</th>
+                            <th class="lunch-heading">Lunch</th>
+                            <th>13:30 - 14:30</th>
+                            <th>14:30 - 15:30</th>
+                            <th>15:30 - 16:00</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for day_num in "012345" %}
+                        <tr>
+                            <td class="day-cell">
+                                <span class="day-label">
+                                    {% if day_num == "0" %}Monday
+                                    {% elif day_num == "1" %}Tuesday
+                                    {% elif day_num == "2" %}Wednesday
+                                    {% elif day_num == "3" %}Thursday
+                                    {% elif day_num == "4" %}Friday
+                                    {% else %}Saturday
+                                    {% endif %}
+                                </span>
+                            </td>
+
+                            {% for slot_num in "01234567" %}
+                                {% if slot_num == "4" %}
+                                    <td class="lunch-cell">LUNCH</td>
+                                {% else %}
+                                    <td>
+                                        {% for slot in timetable %}
+                                            {% if slot.day|stringformat:"s" == day_num %}
+                                                {% with start=slot.start_time|time:"H:i" %}
+                                                    {% if slot_num == "0" and start >= "09:00" and start < "10:00" or slot_num == "1" and start >= "10:00" and start < "11:00" or slot_num == "2" and start >= "11:00" and start < "12:00" or slot_num == "3" and start >= "12:00" and start < "13:00" or slot_num == "5" and start >= "13:30" and start < "14:30" or slot_num == "6" and start >= "14:30" and start < "15:30" or slot_num == "7" and start >= "15:30" %}
+                                                        <div class="class-card {% if slot.session_type == 'LAB' %}lab{% endif %}">
+                                                            <strong>{{ slot.subject.name }}</strong>
+
+                                                            <span>
+                                                                {{ slot.start_time|time:"H:i" }} -
+                                                                {{ slot.end_time|time:"H:i" }}
+                                                            </span>
+
+                                                            <span>Teacher: {{ slot.teacher.user.get_full_name|default:slot.teacher.user.username }}</span>
+
+                                                            <span>
+                                                                Room: {{ slot.room|default:"-" }}
+                                                            </span>
+
+                                                            <span>
+                                                                {{ slot.get_session_type_display }}
+                                                            </span>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="timetable-note">
+            Scroll horizontally to view the complete weekly schedule.
+        </p>
+
+    </section>
+
+    <section class="dashboard-content student-detail-section" id="todayTimetablePanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">Today's Timetable</h1>
+        <div class="today-panel">
+            <h2>Today's Classes</h2>
+
+            {% for slot in today_timetable %}
+            <div class="today-card">
+                <strong>{{ slot.subject.name }}</strong>
+
+                <span>
+                    Time:
+                    {{ slot.start_time|time:"h:i A" }} -
+                    {{ slot.end_time|time:"h:i A" }}
+                </span>
+
+                <span>Teacher: {{ slot.teacher.user.get_full_name|default:slot.teacher.user.username }}</span>
+
+                <span>Type: {{ slot.get_session_type_display }}</span>
+
+                {% if slot.room %}
+                <span>Room: {{ slot.room }}</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-muted mb-0">
+                No classes scheduled for today.
+            </p>
             {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      <a href="{% url 'download_attendance_pdf' %}" class="btn btn-warning mt-3">Download Report</a>
-    </div>
+        </div>
 
-    <!-- Recent Activity / Notifications -->
-    <div class="dashboard-content mb-4">
-      <h1>Recent Activity</h1>
-      <ul class="list-group list-group-flush">
-        {% for notification in notifications %}
-        <li class="list-group-item bg-transparent border-0">
-          <span class="fw-semibold text-dark">{{ notification.date }}</span> – {{ notification.message }}
-        </li>
+    </section>
+
+    <section class="dashboard-content student-detail-section" id="adjustedTimetablePanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">Adjusted Timetable</h1>
+        <div class="today-panel">
+            <h2>Approved leave class adjustments</h2>
+            <p class="text-muted">These date-specific changes are separate from your regular timetable.</p>
+            {% for adjustment in student_adjustments %}
+            <div class="today-card">
+                <strong>{{ adjustment.subject.name }} - {{ adjustment.class_date|date:"D, M j, Y" }}</strong>
+                <span>Time: {{ adjustment.start_time|time:"h:i A" }} - {{ adjustment.end_time|time:"h:i A" }}</span>
+                <span>Regular teacher: {{ adjustment.original_teacher.user.get_full_name|default:adjustment.original_teacher.user.username }} (on leave)</span>
+                {% if adjustment.adjustment_type == "SUBSTITUTE" %}
+                    <span>Covering teacher: {{ adjustment.substitute_teacher.user.get_full_name|default:adjustment.substitute_teacher.user.username }}</span>
+                {% elif adjustment.adjustment_type == "LIBRARY" %}
+                    <span>Plan: Library period</span>
+                    <span>Location: Library{% if adjustment.room %} - Room {{ adjustment.room }}{% else %} - room not assigned{% endif %}</span>
+                {% else %}
+                    <span>Plan: {{ adjustment.custom_activity }}</span>
+                {% endif %}
+                {% if adjustment.room and adjustment.adjustment_type != "LIBRARY" %}<span>Room: {{ adjustment.room }}</span>{% endif %}
+                {% if adjustment.admin_note %}<span>Note: {{ adjustment.admin_note }}</span>{% endif %}
+            </div>
+            {% empty %}
+            <p class="text-muted mb-0">There are no current or upcoming class adjustments.</p>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="dashboard-content student-detail-section" id="announcementsPanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">Recent announcements for students</h1>
+        {% for announcement in announcements %}
+        <article class="activity-item">
+            <strong>{{ announcement.title }}</strong>
+            <div class="activity-date">
+                {% if announcement.semester %}Semester {{ announcement.semester }}{% else %}All students{% endif %}  {{ announcement.created_at|date:"M j, Y, g:i a" }}
+                {% if announcement.teacher %}  {{ announcement.teacher.user.get_full_name|default:announcement.teacher.user.username }}{% elif announcement.created_by %}  {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}{% endif %}
+            </div>
+            <p style="white-space:pre-wrap; margin:8px 0 0;">{{ announcement.message }}</p>
+        </article>
         {% empty %}
-        <li class="list-group-item bg-transparent border-0 text-muted">No recent activity.</li>
+        <div class="activity-item text-muted">No announcements for your semester yet.</div>
         {% endfor %}
-      </ul>
-    </div>
-  </div>
+    </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <section class="dashboard-content student-detail-section" id="testsPanel" style="display:none;">
+        <button type="button" class="btn btn-outline-primary back-dashboard-button" onclick="showStudentDashboard()">Back to dashboard</button>
+        <h1 class="section-title">Tests &amp; Marks</h1>
+        {% for class_test in student_tests %}
+        <article class="activity-item">
+            <h2 style="font-size:1.05rem; font-weight:800;">{{ class_test.title }}  {{ class_test.subject.name }}</h2>
+            <div class="activity-date">Test date: {{ class_test.test_date|date:"M j, Y" }}  Maximum marks: {{ class_test.max_marks }}  Teacher: {{ class_test.teacher.user.get_full_name|default:class_test.teacher.user.username }}</div>
+            <p class="mb-2 mt-2"><strong>Units / topics:</strong><br>{{ class_test.units_topics|linebreaksbr }}</p>
+            {% if class_test.student_result %}
+            <div class="alert alert-success mb-0"><strong>Your marks:</strong> {{ class_test.student_result.marks_obtained }} / {{ class_test.max_marks }}</div>
+            {% else %}
+            <div class="alert alert-secondary mb-0">Marks have not been published yet.</div>
+            {% endif %}
+        </article>
+        {% empty %}
+        <p class="text-muted">No test details have been posted for your class yet.</p>
+        {% endfor %}
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="dashboard-content student-overview-section">
+        <h1 class="section-title">Recent Activity</h1>
+
+        {% for notification in notifications %}
+        <div class="activity-item">
+            <span class="activity-date">{{ notification.date }}</span>
+            &ndash;
+            {{ notification.message }}
+        </div>
+        {% empty %}
+        <div class="activity-item text-muted">
+            No recent activity.
+        </div>
+        {% endfor %}
+    </section>
+
+</main>
+
+{% if unread_announcements or unread_dashboard_notices %}
+<div class="modal fade" id="newAnnouncementsModal" tabindex="-1" aria-labelledby="newAnnouncementsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="newAnnouncementsTitle">New updates for you</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="announcementReadForm" method="post" action="{% url 'mark_announcements_read' %}">
+                {% csrf_token %}
+                {% for announcement in unread_announcements %}<input type="hidden" name="announcement_ids" value="{{ announcement.pk }}">{% endfor %}
+                {% for notice in unread_dashboard_notices %}<input type="hidden" name="notice_keys" value="{{ notice.key }}">{% endfor %}
+                <div class="modal-body">
+                    {% for announcement in unread_announcements %}
+                    <article class="border-bottom py-3">
+                        <div class="small text-primary fw-semibold">Audience: Students{% if announcement.semester %}  Semester {{ announcement.semester }}{% endif %}</div>
+                        <h3 class="h5 mt-2">{{ announcement.title }}</h3>
+                        <p class="mb-2" style="white-space:pre-wrap;">{{ announcement.message }}</p>
+                        <div class="small text-muted">{{ announcement.created_at|date:"M j, Y, g:i a" }}{% if announcement.teacher %}  {{ announcement.teacher.user.get_full_name|default:announcement.teacher.user.username }}{% elif announcement.created_by %}  {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}{% endif %}</div>
+                    </article>
+                    {% endfor %}
+                    {% for notice in unread_dashboard_notices %}
+                    <article class="border-bottom py-3">
+                        <div class="small text-success fw-semibold">{{ notice.type }}</div>
+                        <h3 class="h5 mt-2">{{ notice.title }}</h3>
+                        <p class="mb-0">{{ notice.detail }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showStudentSection(sectionId) {
+        document.querySelectorAll(".student-overview-section, .student-section-cards, .student-detail-section")
+            .forEach(function (section) { section.style.display = "none"; });
+        document.getElementById(sectionId).style.display = "block";
+        window.scrollTo(0, 0);
+    }
+
+    function showStudentDashboard() {
+        document.querySelectorAll(".student-overview-section, .student-section-cards")
+            .forEach(function (section) { section.style.display = ""; });
+        document.querySelectorAll(".student-detail-section")
+            .forEach(function (section) { section.style.display = "none"; });
+        window.scrollTo(0, 0);
+    }
+</script>
+{% if unread_announcements or unread_dashboard_notices %}
+<script>
+    const newAnnouncementsModal = document.getElementById("newAnnouncementsModal");
+    const announcementModal = new bootstrap.Modal(newAnnouncementsModal);
+    announcementModal.show();
+    newAnnouncementsModal.addEventListener("hidden.bs.modal", function () {
+        fetch(document.getElementById("announcementReadForm").action, {
+            method: "POST",
+            body: new FormData(document.getElementById("announcementReadForm")),
+            headers: {"X-Requested-With": "XMLHttpRequest"}
+        });
+    }, {once: true});
+</script>
+{% endif %}
+
 </body>
 </html>

@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 
 <!DOCTYPE html>
 
@@ -268,6 +268,7 @@
         }
     </style>
 
+<link rel="stylesheet" href="/static/css/portal-theme.css">
 </head>
 
 <body>
@@ -281,7 +282,7 @@
     <div class="header">
 
         <div>
-            <h1>📷 Live Attendance</h1>
+            <h1> Live Attendance</h1>
 
             <p>
                 Face Recognition Attendance System
@@ -293,7 +294,7 @@
             <a href="{% url 'teacherpanel' %}"
                class="back-btn">
 
-                ← Teacher Panel
+                 Teacher Panel
 
             </a>
 
@@ -302,7 +303,7 @@
             <a href="{% url 'adminpanel' %}"
                class="back-btn">
 
-                ← Admin Panel
+                 Admin Panel
 
             </a>
 
@@ -331,23 +332,13 @@
 
                 {% if teacher_mode %}
 
-                    <select id="branch" disabled>
-
-                        <option
-                            value="{{ teacher_branch }}"
-                            selected>
-
-                            {{ teacher_branch }}
-
-                        </option>
-
+                    <select id="branch">
+                        {% for branch in teacher_branches %}
+                        <option value="{{ branch }}"{% if branch == teacher_branch %} selected{% endif %}>{{ branch }}</option>
+                        {% empty %}
+                        <option value="">No assigned branch</option>
+                        {% endfor %}
                     </select>
-
-                    <input
-                        type="hidden"
-                        id="branchHidden"
-                        value="{{ teacher_branch }}"
-                    >
 
                 {% else %}
 
@@ -388,10 +379,11 @@
 
                     {% if teacher_mode %}
 
-                        {% for semester in assigned_semesters %}
+                        {% for branch, semester in assigned_semesters %}
 
                             <option
-                                value="{{ semester }}">
+                                value="{{ semester }}"
+                                data-branch="{{ branch }}">
 
                                 {% if semester == "1" %}
                                     1st Semester
@@ -471,7 +463,8 @@
                             <option
                                 value="{{ subject.name }}"
                                 data-subject-id="{{ subject.id }}"
-                                data-semester="{{ subject.semester }}">
+                                data-semester="{{ subject.semester }}"
+                                data-branch="{{ subject.branch }}">
 
                                 {{ subject.name }}
 
@@ -502,8 +495,10 @@
 
             <div class="info">
 
-                🔒 Branch, semester and subjects are based
-                on the subjects assigned to this teacher.
+                Select a class from your assigned branches, semesters and subjects.
+                A single available choice is selected automatically. The camera
+                can recognize several students in one frame when their faces
+                are clearly visible.
 
             </div>
 
@@ -550,7 +545,7 @@
                         class="camera-placeholder">
 
                         <div class="icon">
-                            📷
+                            
                         </div>
 
                         <div>
@@ -577,7 +572,7 @@
                         id="startCameraBtn"
                         class="start-btn">
 
-                        📷 Start Attendance
+                         Start Attendance
 
                     </button>
 
@@ -588,7 +583,7 @@
                         class="stop-btn"
                         disabled>
 
-                        ⛔ Stop Attendance
+                         Stop Attendance
 
                     </button>
 
@@ -693,6 +688,10 @@
 </div>
 
 
+{% if not teacher_mode %}
+{{ semester_subjects|json_script:"semester-subject-data" }}
+{% endif %}
+
 <script>
 
 /* =====================================================
@@ -744,9 +743,7 @@ function getBranch() {
 
     {% if teacher_mode %}
 
-        return document.getElementById(
-            "branchHidden"
-        ).value;
+        return branchSelect.value;
 
     {% else %}
 
@@ -823,8 +820,33 @@ function updateDetails() {
 
 function filterTeacherSubjects() {
 
+    const branch =
+        getBranch();
+
     const semester =
         semesterSelect.value;
+
+    const semesterOptions =
+        semesterSelect.querySelectorAll(
+            "option[data-branch]"
+        );
+
+    semesterOptions.forEach(function(option) {
+        option.hidden =
+            Boolean(branch) &&
+            option.getAttribute("data-branch") !== branch;
+    });
+
+    const selectedSemester =
+        semesterSelect.options[semesterSelect.selectedIndex];
+
+    if (
+        selectedSemester &&
+        selectedSemester.value &&
+        selectedSemester.hidden
+    ) {
+        semesterSelect.value = "";
+    }
 
     const options =
         subjectSelect.querySelectorAll(
@@ -838,11 +860,15 @@ function filterTeacherSubjects() {
             option.getAttribute(
                 "data-semester"
             );
+        const subjectBranch =
+            option.getAttribute(
+                "data-branch"
+            );
 
 
         if (
-            !semester ||
-            subjectSemester === semester
+            (!branch || subjectBranch === branch) &&
+            (!semester || subjectSemester === semester)
         ) {
 
             option.hidden = false;
@@ -880,60 +906,28 @@ function filterTeacherSubjects() {
 
 function initializeTeacherDetails() {
 
-    const semesterCount =
-        {{ assigned_semesters|length }};
-
-    const subjectCount =
-        {{ assigned_subjects|length }};
-
-
-    if (semesterCount === 1) {
-
-        semesterSelect.value =
-            "{{ assigned_semesters.0 }}";
-
-    }
-
-
     filterTeacherSubjects();
 
-
-    if (subjectCount === 1) {
-
-        subjectSelect.value =
-            "{{ assigned_subjects.0.id }}";
-
+    const visibleSemesters = Array.from(
+        semesterSelect.options
+    ).filter(function(option) {
+        return option.value && !option.hidden;
+    });
+    if (visibleSemesters.length === 1) {
+        semesterSelect.value = visibleSemesters[0].value;
     }
-
-
-    if (subjectSelect.value) {
-
-        const selected =
-            subjectSelect.options[
-                subjectSelect.selectedIndex
-            ];
-
-        if (selected) {
-
-            const subjectSemester =
-                selected.getAttribute(
-                    "data-semester"
-                );
-
-            if (subjectSemester) {
-
-                semesterSelect.value =
-                    subjectSemester;
-
-            }
-
-        }
-
-    }
-
 
     filterTeacherSubjects();
+    const visibleSubjects = Array.from(
+        subjectSelect.options
+    ).filter(function(option) {
+        return option.value && !option.hidden;
+    });
+    if (visibleSubjects.length === 1) {
+        subjectSelect.value = visibleSubjects[0].value;
+    }
 
+    filterTeacherSubjects();
     updateDetails();
 
 }
@@ -948,7 +942,9 @@ function initializeTeacherDetails() {
 {% if not teacher_mode %}
 
 const semesterSubjects =
-    {{ semester_subjects|safe }};
+    JSON.parse(
+        document.getElementById("semester-subject-data").textContent
+    );
 
 
 function updateAdminSubjects() {
@@ -1068,6 +1064,15 @@ subjectSelect.addEventListener(
     }
 );
 
+branchSelect.addEventListener(
+    "change",
+    function() {
+        semesterSelect.value = "";
+        subjectSelect.value = "";
+        filterTeacherSubjects();
+    }
+);
+
 {% endif %}
 
 
@@ -1108,7 +1113,7 @@ async function startCamera() {
     if (!branch) {
 
         setStatus(
-            "⚠️ Branch is required.",
+            " Branch is required.",
             "error"
         );
 
@@ -1120,7 +1125,7 @@ async function startCamera() {
     if (!semester) {
 
         setStatus(
-            "⚠️ Please select semester.",
+            " Please select semester.",
             "error"
         );
 
@@ -1132,7 +1137,7 @@ async function startCamera() {
     if (!subject) {
 
         setStatus(
-            "⚠️ Please select subject.",
+            " Please select subject.",
             "error"
         );
 
@@ -1147,7 +1152,7 @@ async function startCamera() {
     ) {
 
         setStatus(
-            "❌ Camera API is not available. Open the Django site using localhost or HTTPS.",
+            " Camera API is not available. Open the Django site using localhost or HTTPS.",
             "error"
         );
 
@@ -1159,7 +1164,7 @@ async function startCamera() {
     try {
 
         setStatus(
-            "📷 Requesting camera permission...",
+            " Requesting camera permission...",
             "warning"
         );
 
@@ -1235,7 +1240,7 @@ async function startCamera() {
 
 
         setStatus(
-            "✅ Attendance started. Camera is continuously scanning...",
+            " Attendance started. Camera is continuously scanning...",
             "success"
         );
 
@@ -1257,7 +1262,7 @@ async function startCamera() {
 
 
         setStatus(
-            "❌ Camera start nahi hua: " +
+            " Camera start nahi hua: " +
             error.message,
             "error"
         );
@@ -1540,7 +1545,7 @@ async function sendAttendance(
         if (data.success) {
 
             setStatus(
-                "✅ " +
+                " " +
                 (
                     data.message ||
                     "Attendance marked successfully!"
@@ -1653,7 +1658,7 @@ async function sendAttendance(
                     ">
 
                         <strong>
-                            ⚠️ Already Marked
+                             Already Marked
                         </strong>
 
                         <br><br>
@@ -1699,7 +1704,7 @@ async function sendAttendance(
                 <div class="result-success">
 
                     <strong>
-                        ✅ Attendance Marked
+                         Attendance Marked
                     </strong>
 
                     <br><br>
@@ -1724,7 +1729,7 @@ async function sendAttendance(
         if (data.already_marked) {
 
             setStatus(
-                "⚠️ " +
+                " " +
                 (
                     data.message ||
                     "Attendance already marked."
@@ -1738,7 +1743,7 @@ async function sendAttendance(
                 <div class="result-error">
 
                     <strong>
-                        ⚠️ Already Marked
+                         Already Marked
                     </strong>
 
                     <br><br>
@@ -1770,7 +1775,7 @@ async function sendAttendance(
         ) {
 
             setStatus(
-                "🔍 Face not recognized. Camera scanning continues...",
+                " Face not recognized. Camera scanning continues...",
                 "warning"
             );
 
@@ -1787,7 +1792,7 @@ async function sendAttendance(
         ) {
 
             setStatus(
-                "👤 No face detected. Camera scanning continues...",
+                " No face detected. Camera scanning continues...",
                 "warning"
             );
 
@@ -1797,7 +1802,7 @@ async function sendAttendance(
 
 
         setStatus(
-            "❌ " +
+            " " +
             (
                 data.error ||
                 "Face recognition failed."
@@ -1810,7 +1815,7 @@ async function sendAttendance(
 
             <div class="result-error">
 
-                ❌ ${
+                 ${
                     escapeHTML(
                         data.error ||
                         "Face recognition failed."
@@ -1832,7 +1837,7 @@ async function sendAttendance(
 
 
         setStatus(
-            "❌ Could not connect to server.",
+            " Could not connect to server.",
             "error"
         );
 
