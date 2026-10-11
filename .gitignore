@@ -12,3 +12,4 @@ db.sqlite3
 *.dump
 register_backup.json
 .vscode/
+/staticfiles/

@@ -8,6 +8,7 @@ import re
 import tempfile
 import uuid
 import secrets
+import traceback
 from functools import lru_cache
 from decimal import Decimal, InvalidOperation
 from collections import Counter
@@ -31,14 +32,22 @@ import face_recognition
 import numpy as np
 
 
+
 @lru_cache(maxsize=4096)
 def _cached_student_face_encoding(image_path, modified_at_ns):
     try:
         image = face_recognition.load_image_file(image_path)
         encodings = face_recognition.face_encodings(image)
         return encodings[0] if encodings else None
-    except Exception:
+    except Exception as e:
+        print(
+            "FACE ENCODING ERROR:",
+            repr(e),
+            "| IMAGE PATH:",
+            repr(image_path),
+        )
         return None
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -1640,17 +1649,28 @@ def _record_attendance_once(student_user, subject, jpeg_bytes, attendance_date):
         subject=subject,
         attendance_date=attendance_date,
     )
+    face_field = Attendance._meta.get_field("face_image")
+    face_storage = face_field.storage
+    relative_name = f"attendance_faces/{uuid.uuid4().hex}.jpg"
+    saved_name = None
     try:
         with transaction.atomic():
-            attendance.face_image.save(
-                f"{uuid.uuid4().hex}.jpg",
+            saved_name = face_storage.save(
+                relative_name,
                 ContentFile(jpeg_bytes),
-                save=True,
+                max_length=face_field.max_length,
             )
+            attendance.face_image.name = saved_name
+            attendance.face_image._committed = True
+            attendance.save()
     except IntegrityError:
-        if attendance.face_image.name:
-            attendance.face_image.storage.delete(attendance.face_image.name)
+        if saved_name:
+            face_storage.delete(saved_name)
         return None
+    except Exception:
+        if saved_name:
+            face_storage.delete(saved_name)
+        raise
     return attendance
 
 
@@ -2597,6 +2617,11 @@ def recognize_attendance(request):
             except (OSError, ValueError):
                 continue
             registered_encoding = _cached_student_face_encoding(image_path, modified_at_ns)
+            print(
+                  "STUDENT:", student.student_name,
+              "ENCODING FOUND:", registered_encoding is not None
+)
+
             if registered_encoding is not None:
                 known_students.append(student)
                 known_encodings.append(registered_encoding)
@@ -2607,6 +2632,8 @@ def recognize_attendance(request):
             if not known_encodings:
                 break
             distances = face_recognition.face_distance(known_encodings, captured_encoding)
+            print("FACE DISTANCES:", distances)
+            print("MATCH THRESHOLD:", tolerance)   
             for student_index, distance in enumerate(distances):
                 if distance <= tolerance:
                     match_candidates.append((float(distance), face_index, student_index))
@@ -2624,7 +2651,8 @@ def recognize_attendance(request):
 
         # CHECK MATCH
         # =====================================================
-
+        print("DEBUG: Known encodings =", len(known_encodings))
+        print("DEBUG: Matched students =", len(matched_students))  
         if not matched_students:
 
             return JsonResponse({
@@ -2791,6 +2819,7 @@ def recognize_attendance(request):
             "Recognition Error:",
             repr(e)
         )
+        traceback.print_exc()
 
         return JsonResponse({
 

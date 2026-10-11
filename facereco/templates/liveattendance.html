@@ -269,9 +269,91 @@
     </style>
 
 <link rel="stylesheet" href="/static/css/portal-theme.css">
+<style>
+    /* Keep this legacy camera page readable with the shared light portal theme. */
+    body.live-attendance-page {
+        color: #334155 !important;
+        background: #f1f5f9 !important;
+    }
+
+    .live-attendance-page .header h1,
+    .live-attendance-page .card h2 {
+        color: #172554 !important;
+    }
+
+    .live-attendance-page .header p,
+    .live-attendance-page .details-label,
+    .live-attendance-page .camera-placeholder,
+    .live-attendance-page #result span[style] {
+        color: #64748b !important;
+    }
+
+    .live-attendance-page .card {
+        color: #334155 !important;
+        background: #fff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 12px 28px rgba(23, 37, 84, .08) !important;
+    }
+
+    .live-attendance-page .card h2,
+    .live-attendance-page .field label,
+    .live-attendance-page .details-value,
+    .live-attendance-page .status,
+    .live-attendance-page .result-box {
+        color: #334155 !important;
+    }
+
+    .live-attendance-page .field label {
+        font-weight: 700;
+    }
+
+    .live-attendance-page select {
+        color: #334155 !important;
+        background: #fff !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    .live-attendance-page select option {
+        color: #334155;
+        background: #fff;
+    }
+
+    .live-attendance-page .info {
+        color: #155e59 !important;
+        background: #ecfdf5 !important;
+        border-color: #99f6e4 !important;
+    }
+
+    .live-attendance-page .back-btn {
+        color: #fff !important;
+        background: #172554 !important;
+        border-color: #172554 !important;
+    }
+
+    .live-attendance-page .start-btn {
+        color: #fff !important;
+        background: #0f766e !important;
+    }
+
+    .live-attendance-page .stop-btn {
+        color: #fff !important;
+        background: #b91c1c !important;
+    }
+
+    .live-attendance-page .status.success,
+    .live-attendance-page .result-success { color: #15803d !important; }
+    .live-attendance-page .status.error,
+    .live-attendance-page .result-error { color: #b91c1c !important; }
+    .live-attendance-page .status.warning { color: #92400e !important; }
+
+    @media (max-width: 800px) {
+        .live-attendance-page { padding: 16px; }
+        .live-attendance-page .card { padding: 20px; }
+    }
+</style>
 </head>
 
-<body>
+<body class="live-attendance-page">
 
 <div class="container">
 
